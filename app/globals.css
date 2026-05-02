@@ -1,26 +1,72 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-sauna-bg:        #0a1a08;
+  --color-sauna-surface:   rgba(255,255,255,0.06);
+  --color-sauna-border:    rgba(255,255,255,0.12);
+  --color-sauna-green:     #7cb342;
+  --color-sauna-bright:    #a5d63a;
+  --color-sauna-text:      #e8f5e0;
+  --color-sauna-muted:     rgba(232,245,224,0.55);
+  --color-sauna-sidebar:   rgba(10,26,8,0.85);
+  --color-sauna-score:     #86c52d;
+  --color-sauna-gold:      #f59e0b;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  background-color: #0a1a08;
+  color: #e8f5e0;
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* フォレストグリーン背景 */
+.sauna-bg {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(80,130,40,0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 90%, rgba(40,90,20,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 50%, rgba(20,50,10,0.15) 0%, transparent 60%),
+    linear-gradient(160deg, #0d2410 0%, #0a1a08 45%, #061206 100%);
+  min-height: 100vh;
+}
+
+/* ガラスカード */
+.glass {
+  background: rgba(255,255,255,0.055);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.11);
+  border-radius: 1rem;
+}
+
+.glass-dark {
+  background: rgba(10,26,8,0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 1rem;
+}
+
+/* スクロールバー */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(124,179,66,0.35); border-radius: 2px; }
+
+/* スライダー */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.15);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7cb342;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(124,179,66,0.5);
 }
