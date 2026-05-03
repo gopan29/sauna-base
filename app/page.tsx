@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Cloud, Bell, TrendingUp, Clock, Flame, BarChart2 } from 'lucide-react'
 import { GlassCard } from '@/components/GlassCard'
 import { ScoreCircle } from '@/components/ScoreCircle'
@@ -7,7 +8,7 @@ import { SaunaRecordCard } from '@/components/SaunaRecordCard'
 import { ScoreTrendChart } from '@/components/ScoreTrendChart'
 import { AIRecommendCard } from '@/components/AIRecommendCard'
 import { SaunaProfileCard } from '@/components/SaunaProfileCard'
-import { getMonthRecords, getProfile } from '@/lib/actions'
+import { getMonthRecords, getUserAndProfile } from '@/lib/actions'
 import {
   mockMonthlyStats,
   mockScoreTrend,
@@ -44,11 +45,12 @@ export default async function DashboardPage() {
   const year = now.getFullYear()
   const month = now.getMonth() + 1
 
-  const [dbRecords, profileData] = await Promise.all([
+  const [dbRecords, { profile: profileData, displayName: fetchedDisplayName }] = await Promise.all([
     getMonthRecords(year, month),
-    getProfile(),
+    getUserAndProfile(),
   ])
   const profile = profileData as { display_name: string | null } | null
+  const isGuest = !profile
 
   const records = dbRecords.map(dbToRecord)
   const hasData = records.length > 0
@@ -108,7 +110,7 @@ export default async function DashboardPage() {
 
   const aiAnalysis = hasData ? analyzeRecords(records) : mockAIAnalysis
 
-  const displayName = profile?.display_name ?? 'ゲスト'
+  const displayName = fetchedDisplayName ?? 'ゲスト'
   const latestScore = hasData ? records[0]?.score ?? 0 : 42
   const visitDiff = stats.prevMonthVisitCount
     ? stats.visitCount - stats.prevMonthVisitCount
@@ -125,13 +127,37 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-4 lg:p-6">
+
+      {/* ゲストバナー */}
+      {isGuest && (
+        <div className="glass rounded-xl p-3 flex items-center gap-3 mb-5"
+          style={{ border: '1px solid rgba(124,179,66,0.25)' }}>
+          <span className="text-xl shrink-0">♨️</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-white/80">ログインして自分のサウナ記録を管理しよう</p>
+            <p className="text-[10px] text-white/40 mt-0.5">今はサンプルデータを表示しています</p>
+          </div>
+          <Link href="/login"
+            className="shrink-0 text-xs px-3 py-1.5 rounded-lg font-semibold"
+            style={{
+              background: 'rgba(124,179,66,0.2)',
+              border: '1px solid rgba(124,179,66,0.4)',
+              color: '#a5d63a',
+            }}>
+            登録無料
+          </Link>
+        </div>
+      )}
+
       {/* ヘッダー */}
       <div className="flex items-start justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-white/90">
-            おはようございます、{displayName}さん 🌿
+            {isGuest ? 'SAUNA BASE へようこそ 🌿' : `おはようございます、${displayName}さん 🌿`}
           </h1>
-          <p className="text-sm text-white/45 mt-0.5">今日も最高のととのいを記録しましょう。</p>
+          <p className="text-sm text-white/45 mt-0.5">
+            {isGuest ? 'サウナ体験をデータで進化させよう。' : '今日も最高のととのいを記録しましょう。'}
+          </p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <div className="hidden sm:flex items-center gap-1.5 glass rounded-xl px-3 py-1.5 text-xs text-white/60">

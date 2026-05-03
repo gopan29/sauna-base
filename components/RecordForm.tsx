@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Star, Thermometer, Droplets, Check } from 'lucide-react'
 import { GlassCard } from './GlassCard'
 import { calculateScore, getScoreRank } from '@/lib/score'
 import { saveRecord } from '@/lib/actions'
+import { useAuth } from '@/contexts/AuthContext'
 import type { RestStyle, BodyCondition } from '@/types'
 
 const restOptions: { value: RestStyle; label: string; icon: string }[] = [
@@ -22,6 +24,7 @@ const conditionOptions: { value: BodyCondition; label: string; emoji: string }[]
 ]
 
 export function RecordForm() {
+  const { user } = useAuth()
   const [form, setForm] = useState({
     date: new Date().toISOString().slice(0, 10),
     facilityName: '',
@@ -43,6 +46,54 @@ export function RecordForm() {
     form.sets, form.saunaTemp, form.waterTemp, form.restStyle, form.subjectiveRating
   )
   const rank = getScoreRank(score)
+
+  if (!user) {
+    return (
+      <div className="space-y-4 max-w-lg mx-auto">
+        {/* スコアプレビュー（デモ） */}
+        <GlassCard className="p-4 text-center"
+          style={{ background: 'rgba(124,179,66,0.08)', border: '1px solid rgba(124,179,66,0.25)' }}>
+          <p className="text-xs text-white/50 mb-1">ととのいスコア（サンプル）</p>
+          <p className="text-5xl font-bold text-[#a5d63a]">42</p>
+          <p className="text-sm text-[#7cb342] mt-1">ととのい上級者</p>
+        </GlassCard>
+
+        <GlassCard className="p-8 text-center">
+          <div className="text-5xl mb-4">♨️</div>
+          <h3 className="text-base font-semibold text-white/85 mb-2">
+            ログインして記録をはじめよう
+          </h3>
+          <p className="text-sm text-white/45 mb-1">
+            あなたのサウナ体験をスコア化・記録・分析するには
+          </p>
+          <p className="text-sm text-white/45 mb-6">
+            アカウントが必要です。登録は無料です。
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link href="/login?tab=signup"
+              className="inline-block w-full py-3.5 rounded-xl text-sm font-bold text-center"
+              style={{
+                background: 'linear-gradient(135deg, #7cb342 0%, #4a7c20 100%)',
+                boxShadow: '0 4px 20px rgba(124,179,66,0.35)',
+                color: '#fff',
+              }}>
+              無料で新規登録
+            </Link>
+            <Link href="/login"
+              className="inline-block w-full py-3 rounded-xl text-sm font-medium text-center"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                color: 'rgba(255,255,255,0.6)',
+              }}>
+              ログイン
+            </Link>
+          </div>
+          <p className="text-[10px] text-white/25 mt-4">登録無料 · メールアドレスのみ · 30秒で完了</p>
+        </GlassCard>
+      </div>
+    )
+  }
 
   const handleSave = async () => {
     if (!form.facilityName.trim()) {

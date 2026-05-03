@@ -5,9 +5,10 @@ import { usePathname } from 'next/navigation'
 import { useTransition } from 'react'
 import {
   LayoutDashboard, PenLine, Calendar, BarChart2,
-  Search, Sparkles, UserCircle, Settings, LogOut, Leaf,
+  Search, Sparkles, UserCircle, Settings, LogOut, Leaf, LogIn,
 } from 'lucide-react'
 import { signOut } from '@/lib/actions'
+import { useAuth } from '@/contexts/AuthContext'
 
 const navItems = [
   { href: '/',         icon: LayoutDashboard, label: 'ダッシュボード' },
@@ -22,13 +23,19 @@ const navItems = [
 export function Sidebar() {
   const path = usePathname()
   const [pending, startTransition] = useTransition()
+  const { user, displayName } = useAuth()
 
   const handleSignOut = () => {
     startTransition(async () => {
       await signOut()
-      window.location.href = '/login'
+      window.location.href = '/'
     })
   }
+
+  const initial = displayName
+    ? displayName[0].toUpperCase()
+    : user?.email?.[0]?.toUpperCase() ?? '?'
+  const name = displayName ?? user?.email?.split('@')[0] ?? ''
 
   return (
     <aside
@@ -93,22 +100,37 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* ユーザー */}
+      {/* ユーザーエリア */}
       <div className="mx-3 mb-3">
-        <div className="glass rounded-xl px-3 py-2.5 flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-            style={{ background: 'linear-gradient(135deg,#7cb342,#4a7c20)' }}>
-            太
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-white/85 truncate">サウナ太郎</p>
-            <p className="text-[10px] text-[#7cb342]">🏆 Lv.12</p>
-          </div>
-        </div>
-        <div className="mt-1 px-1 h-1 rounded-full bg-white/10 overflow-hidden">
-          <div className="h-full rounded-full bg-[#7cb342]" style={{ width: '65%' }} />
-        </div>
-        <p className="text-[9px] text-white/30 text-right mt-0.5">次のLvまで 1,250pt</p>
+        {user ? (
+          <>
+            <div className="glass rounded-xl px-3 py-2.5 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                style={{ background: 'linear-gradient(135deg,#7cb342,#4a7c20)' }}>
+                {initial}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-white/85 truncate">{name}</p>
+                <p className="text-[10px] text-[#7cb342]">🏆 Lv.1</p>
+              </div>
+            </div>
+            <div className="mt-1 px-1 h-1 rounded-full bg-white/10 overflow-hidden">
+              <div className="h-full rounded-full bg-[#7cb342]" style={{ width: '12%' }} />
+            </div>
+            <p className="text-[9px] text-white/30 text-right mt-0.5">次のLvまで 記録を重ねよう</p>
+          </>
+        ) : (
+          <Link href="/login"
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all"
+            style={{
+              background: 'linear-gradient(135deg, rgba(124,179,66,0.18) 0%, rgba(74,124,32,0.18) 100%)',
+              border: '1px solid rgba(124,179,66,0.4)',
+              color: '#a5d63a',
+            }}>
+            <LogIn className="w-4 h-4" />
+            ログイン / 新規登録
+          </Link>
+        )}
       </div>
 
       {/* 下部 */}
@@ -118,13 +140,15 @@ export function Sidebar() {
           <Settings className="w-4 h-4" />
           <span>設定</span>
         </Link>
-        <button
-          onClick={handleSignOut}
-          disabled={pending}
-          className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-white/45 hover:text-white/65 hover:bg-white/5 transition-colors w-full disabled:opacity-40">
-          <LogOut className="w-4 h-4" />
-          <span>{pending ? '...' : 'ログアウト'}</span>
-        </button>
+        {user && (
+          <button
+            onClick={handleSignOut}
+            disabled={pending}
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-white/45 hover:text-white/65 hover:bg-white/5 transition-colors w-full disabled:opacity-40">
+            <LogOut className="w-4 h-4" />
+            <span>{pending ? '...' : 'ログアウト'}</span>
+          </button>
+        )}
       </div>
     </aside>
   )

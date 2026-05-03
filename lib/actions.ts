@@ -6,6 +6,25 @@ import type { Database } from '@/types/database'
 
 type SaunaRecordInsert = Database['public']['Tables']['sauna_records']['Insert']
 
+export async function getUserAndProfile() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { user: null, profile: null }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+
+  const displayName =
+    (profile as { display_name: string | null } | null)?.display_name
+    ?? (user.user_metadata?.display_name as string | undefined)
+    ?? null
+
+  return { user, profile, displayName }
+}
+
 export async function saveRecord(data: Omit<SaunaRecordInsert, 'user_id'>) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
