@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Star, Thermometer, Droplets, Check, MapPin, Plus } from 'lucide-react'
+import { Star, Thermometer, Droplets, Check, MapPin, Plus, Wind, Home, Clock, X, Leaf } from 'lucide-react'
 import { GlassCard } from './GlassCard'
 import { calculateScore, getScoreRank } from '@/lib/score'
 import { saveRecord, searchFacilities, addFacility } from '@/lib/actions'
@@ -17,18 +17,18 @@ type FacilitySuggestion = {
   city: string | null
 }
 
-const restOptions: { value: RestStyle; label: string; icon: string }[] = [
-  { value: 'outdoor', label: '外気浴', icon: '🌿' },
-  { value: 'indoor',  label: '内気浴', icon: '🛋️' },
-  { value: 'rest_only', label: '休憩のみ', icon: '😴' },
-  { value: 'none',    label: 'なし', icon: '✗' },
+const restOptions: { value: RestStyle; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { value: 'outdoor',   label: '外気浴',   icon: Wind },
+  { value: 'indoor',    label: '内気浴',   icon: Home },
+  { value: 'rest_only', label: '休憩のみ', icon: Clock },
+  { value: 'none',      label: 'なし',     icon: X },
 ]
 
-const conditionOptions: { value: BodyCondition; label: string; emoji: string }[] = [
-  { value: 'great',  label: '良い',     emoji: '😊' },
-  { value: 'normal', label: '普通',     emoji: '😐' },
-  { value: 'tired',  label: '疲れ気味', emoji: '😪' },
-  { value: 'sick',   label: '不調',     emoji: '🤒' },
+const conditionOptions: { value: BodyCondition; label: string }[] = [
+  { value: 'great',  label: '良い'     },
+  { value: 'normal', label: '普通'     },
+  { value: 'tired',  label: '疲れ気味' },
+  { value: 'sick',   label: '不調'     },
 ]
 
 export function RecordForm() {
@@ -108,7 +108,7 @@ export function RecordForm() {
         </GlassCard>
 
         <GlassCard className="p-8 text-center">
-          <div className="text-5xl mb-4">♨️</div>
+          <Leaf className="w-12 h-12 mx-auto mb-4 text-[#7cb342]/50" />
           <h3 className="text-base font-semibold text-white/85 mb-2">
             ログインして記録をはじめよう
           </h3>
@@ -336,7 +336,7 @@ export function RecordForm() {
                   border: `1px solid ${form.restStyle === o.value ? 'rgba(124,179,66,0.4)' : 'rgba(255,255,255,0.1)'}`,
                 }}
               >
-                <span className="text-lg">{o.icon}</span>
+                <o.icon className="w-4 h-4" />
                 <span>{o.label}</span>
               </button>
             ))}
@@ -375,7 +375,6 @@ export function RecordForm() {
                   border: `1px solid ${form.bodyCondition === o.value ? 'rgba(124,179,66,0.4)' : 'rgba(255,255,255,0.1)'}`,
                 }}
               >
-                <span className="text-xl">{o.emoji}</span>
                 <span>{o.label}</span>
               </button>
             ))}

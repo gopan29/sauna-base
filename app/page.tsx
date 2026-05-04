@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Cloud, Bell, TrendingUp, Clock, Flame, BarChart2, Shield } from 'lucide-react'
+import { Cloud, Bell, TrendingUp, Clock, Flame, BarChart2, Shield, Leaf } from 'lucide-react'
 import { GlassCard } from '@/components/GlassCard'
 import { ScoreCircle } from '@/components/ScoreCircle'
 import { StatCard } from '@/components/StatCard'
@@ -132,7 +132,7 @@ export default async function DashboardPage() {
       {isGuest && (
         <div className="glass rounded-xl p-3 flex items-center gap-3 mb-5"
           style={{ border: '1px solid rgba(124,179,66,0.25)' }}>
-          <span className="text-xl shrink-0">♨️</span>
+          <Leaf className="w-5 h-5 shrink-0 text-[#7cb342]" />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-white/80">ログインして自分のサウナ記録を管理しよう</p>
             <p className="text-[10px] text-white/40 mt-0.5">今はサンプルデータを表示しています</p>
@@ -153,7 +153,7 @@ export default async function DashboardPage() {
       <div className="flex items-start justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-white/90">
-            {isGuest ? 'SAUNA BASE へようこそ 🌿' : `おはようございます、${displayName}さん 🌿`}
+            {isGuest ? 'SAUNA BASE へようこそ' : `おはようございます、${displayName}さん`}
           </h1>
           <p className="text-sm text-white/45 mt-0.5">
             {isGuest ? 'サウナ体験をデータで進化させよう。' : '今日も最高のととのいを記録しましょう。'}
@@ -318,7 +318,7 @@ export default async function DashboardPage() {
               <div className="space-y-2">
                 <div>
                   <p className="text-[9px] text-white/40">ベストコンディション時間帯</p>
-                  <p className="text-xs font-medium text-white/75">☀️ 15:00 - 18:00</p>
+                  <p className="text-xs font-medium text-white/75">15:00 - 18:00</p>
                 </div>
                 <div>
                   <p className="text-[9px] text-white/40">ととのいやすい曜日</p>

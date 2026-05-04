@@ -1,9 +1,11 @@
 'use client'
 
+import React from 'react'
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis,
   ResponsiveContainer
 } from 'recharts'
+import { Thermometer, Droplets, Leaf, Users, CalendarDays } from 'lucide-react'
 import { GlassCard } from './GlassCard'
 import type { SaunaProfile } from '@/types'
 
@@ -19,12 +21,12 @@ const radarData = [
   { subject: 'サウナ頻度', value: 4 },
 ]
 
-const profileItems = [
-  { icon: '🌡️', label: '好きなサウナ温度', value: '90〜100℃' },
-  { icon: '❄️', label: '好きな水風呂温度', value: '14〜17℃' },
-  { icon: '🌳', label: '外気浴の好み', value: '外気浴が好き' },
-  { icon: '👥', label: '混雑耐性', value: 'やや平気' },
-  { icon: '📅', label: 'サウナ頻度', value: '週2〜3回' },
+const profileItems: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }[] = [
+  { icon: Thermometer,  label: '好きなサウナ温度', value: '90〜100℃' },
+  { icon: Droplets,     label: '好きな水風呂温度', value: '14〜17℃' },
+  { icon: Leaf,         label: '外気浴の好み',     value: '外気浴が好き' },
+  { icon: Users,        label: '混雑耐性',         value: 'やや平気' },
+  { icon: CalendarDays, label: 'サウナ頻度',       value: '週2〜3回' },
 ]
 
 export function SaunaProfileCard({ profile }: Props) {
@@ -62,7 +64,7 @@ export function SaunaProfileCard({ profile }: Props) {
         {profileItems.map(item => (
           <div key={item.label} className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5 text-white/50">
-              <span>{item.icon}</span>
+              <item.icon className="w-3.5 h-3.5 shrink-0" />
               <span>{item.label}</span>
             </div>
             <span className="text-white/75 font-medium">{item.value}</span>

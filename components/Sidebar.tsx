@@ -113,7 +113,7 @@ export function Sidebar() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-white/85 truncate">{name}</p>
-                <p className="text-[10px] text-[#7cb342]">🏆 Lv.1</p>
+                <p className="text-[10px] text-[#7cb342]">Lv.1</p>
               </div>
             </div>
             <div className="mt-1 px-1 h-1 rounded-full bg-white/10 overflow-hidden">

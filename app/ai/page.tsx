@@ -1,4 +1,4 @@
-import { Sparkles, MapPin, TrendingUp } from 'lucide-react'
+import { Sparkles, MapPin, TrendingUp, Thermometer, Droplets, RefreshCw, Leaf } from 'lucide-react'
 import { GlassCard } from '@/components/GlassCard'
 import { mockAIAnalysis } from '@/lib/mock-data'
 
@@ -25,13 +25,13 @@ export default function AIPage() {
           </p>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { icon: '🌡️', label: 'ベストサウナ温度', value: a.bestSaunaTemp },
-              { icon: '❄️', label: 'ベスト水風呂温度', value: a.bestWaterTemp },
-              { icon: '🔁', label: 'ベストセット数', value: `${a.bestSets}セット` },
-              { icon: '🌿', label: 'ベスト体験スタイル', value: '外気浴（長め）' },
+              { icon: Thermometer, label: 'ベストサウナ温度', value: a.bestSaunaTemp },
+              { icon: Droplets,    label: 'ベスト水風呂温度', value: a.bestWaterTemp },
+              { icon: RefreshCw,   label: 'ベストセット数',   value: `${a.bestSets}セット` },
+              { icon: Leaf,        label: 'ベスト体験スタイル', value: '外気浴（長め）' },
             ].map(item => (
               <div key={item.label} className="glass rounded-xl p-2.5 text-center">
-                <p className="text-lg mb-0.5">{item.icon}</p>
+                <item.icon className="w-4 h-4 mx-auto mb-0.5 text-[#a5d63a]" />
                 <p className="text-[9px] text-white/40">{item.label}</p>
                 <p className="text-xs font-semibold text-[#a5d63a]">{item.value}</p>
               </div>
@@ -65,7 +65,7 @@ export default function AIPage() {
             <div className="flex-1 space-y-2">
               <div>
                 <p className="text-[9px] text-white/40">ベストコンディション時間帯</p>
-                <p className="text-xs text-white/70">☀️ {a.bestTimeSlot}</p>
+                <p className="text-xs text-white/70">{a.bestTimeSlot}</p>
               </div>
               <div>
                 <p className="text-[9px] text-white/40">ととのいやすい曜日</p>
