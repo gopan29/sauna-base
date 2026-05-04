@@ -22,7 +22,7 @@ export async function requireAdminAuth() {
 }
 
 export async function adminLogin(password: string): Promise<{ error?: string }> {
-  if (password !== process.env.ADMIN_PASSWORD) {
+  if (password.trim() !== (process.env.ADMIN_PASSWORD ?? '').trim()) {
     return { error: 'パスワードが正しくありません' }
   }
   const cookieStore = await cookies()
