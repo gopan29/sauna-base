@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Cloud, Bell, TrendingUp, Clock, Flame, BarChart2 } from 'lucide-react'
+import { Cloud, Bell, TrendingUp, Clock, Flame, BarChart2, Shield } from 'lucide-react'
 import { GlassCard } from '@/components/GlassCard'
 import { ScoreCircle } from '@/components/ScoreCircle'
 import { StatCard } from '@/components/StatCard'
@@ -164,6 +164,11 @@ export default async function DashboardPage() {
             <Cloud className="w-3.5 h-3.5" />
             <span>23℃ 東京都 渋谷区 晴れ</span>
           </div>
+          <Link href="/admin"
+            className="glass flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs text-white/50 hover:text-white/75 transition-colors">
+            <Shield className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">管理画面</span>
+          </Link>
           <button className="glass w-8 h-8 rounded-full flex items-center justify-center relative">
             <Bell className="w-4 h-4 text-white/60" />
             <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#a5d63a]" />
