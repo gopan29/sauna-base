@@ -54,7 +54,7 @@ export default function LoginPage() {
     }
     setLoading(true)
     resetMessage()
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { display_name: displayName || email.split('@')[0] } },
@@ -62,6 +62,8 @@ export default function LoginPage() {
     if (error) {
       setMessage(error.message)
       setMessageType('error')
+    } else if (data.session) {
+      router.push('/onboarding')
     } else {
       setMessage('確認メールを送信しました。メールをご確認の上、ログインしてください。')
       setMessageType('success')
