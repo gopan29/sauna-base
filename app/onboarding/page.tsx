@@ -39,7 +39,7 @@ export default function OnboardingPage() {
   const handleProfileContinue = () => setStep('prompt')
 
   return (
-    <>
+    <div style={{ background: 'linear-gradient(180deg, #0a1a08 0%, #0d2210 100%)', minHeight: '100svh' }}>
       {step === 'start' && (
         <DiagnosisStart onStart={handleStart} />
       )}
@@ -63,6 +63,6 @@ export default function OnboardingPage() {
       {step === 'prompt' && profile && (
         <FirstDashboardPrompt profile={profile} />
       )}
-    </>
+    </div>
   )
 }
