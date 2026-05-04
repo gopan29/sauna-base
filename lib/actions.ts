@@ -76,6 +76,34 @@ export async function getMonthRecords(year: number, month: number) {
   return data ?? []
 }
 
+export async function searchFacilities(query: string) {
+  if (!query.trim()) return []
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('sauna_facilities')
+    .select('id, name, address, prefecture, city')
+    .ilike('name', `%${query}%`)
+    .order('record_count', { ascending: false })
+    .limit(8)
+  return data ?? []
+}
+
+export async function addFacility(name: string, prefecture?: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data } = await supabase
+    .from('sauna_facilities')
+    .insert({
+      name,
+      prefecture: prefecture ?? null,
+      status: user ? 'pending' : 'pending',
+      source: 'user',
+    })
+    .select('id, name')
+    .single()
+  return data
+}
+
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()

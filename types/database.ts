@@ -82,6 +82,53 @@ export type Database = {
         }
         Relationships: []
       }
+      sauna_facilities: {
+        Row: {
+          id: string
+          name: string
+          address: string | null
+          lat: number | null
+          lng: number | null
+          prefecture: string | null
+          city: string | null
+          status: string
+          record_count: number
+          avg_sauna_temp: number | null
+          avg_water_temp: number | null
+          source: string
+          osm_id: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          address?: string | null
+          lat?: number | null
+          lng?: number | null
+          prefecture?: string | null
+          city?: string | null
+          status?: string
+          record_count?: number
+          avg_sauna_temp?: number | null
+          avg_water_temp?: number | null
+          source?: string
+          osm_id?: number | null
+          created_at?: string
+        }
+        Update: {
+          name?: string
+          address?: string | null
+          lat?: number | null
+          lng?: number | null
+          prefecture?: string | null
+          city?: string | null
+          status?: string
+          record_count?: number
+          avg_sauna_temp?: number | null
+          avg_water_temp?: number | null
+        }
+        Relationships: []
+      }
       sauna_profiles: {
         Row: {
           user_id: string

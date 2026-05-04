@@ -1,13 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Star, Thermometer, Droplets, Check } from 'lucide-react'
+import { Star, Thermometer, Droplets, Check, MapPin, Plus } from 'lucide-react'
 import { GlassCard } from './GlassCard'
 import { calculateScore, getScoreRank } from '@/lib/score'
-import { saveRecord } from '@/lib/actions'
+import { saveRecord, searchFacilities, addFacility } from '@/lib/actions'
 import { useAuth } from '@/contexts/AuthContext'
 import type { RestStyle, BodyCondition } from '@/types'
+
+type FacilitySuggestion = {
+  id: string
+  name: string
+  address: string | null
+  prefecture: string | null
+  city: string | null
+}
 
 const restOptions: { value: RestStyle; label: string; icon: string }[] = [
   { value: 'outdoor', label: '外気浴', icon: '🌿' },
@@ -41,6 +49,47 @@ export function RecordForm() {
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [suggestions, setSuggestions] = useState<FacilitySuggestion[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [facilityId, setFacilityId] = useState<string | null>(null)
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const suggestRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (suggestRef.current && !suggestRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const handleFacilityInput = (value: string) => {
+    set('facilityName', value)
+    setFacilityId(null)
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    if (value.trim().length < 1) { setSuggestions([]); setShowSuggestions(false); return }
+    searchTimer.current = setTimeout(async () => {
+      const results = await searchFacilities(value)
+      setSuggestions(results as FacilitySuggestion[])
+      setShowSuggestions(true)
+    }, 300)
+  }
+
+  const selectFacility = (f: FacilitySuggestion) => {
+    set('facilityName', f.name)
+    setFacilityId(f.id)
+    setSuggestions([])
+    setShowSuggestions(false)
+  }
+
+  const handleAddNewFacility = async () => {
+    if (!form.facilityName.trim()) return
+    const result = await addFacility(form.facilityName.trim())
+    if (result) setFacilityId(result.id)
+    setShowSuggestions(false)
+  }
 
   const score = calculateScore(
     form.sets, form.saunaTemp, form.waterTemp, form.restStyle, form.subjectiveRating
@@ -151,16 +200,52 @@ export function RecordForm() {
             style={{ border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)' }}
           />
         </div>
-        <div>
+        <div className="relative" ref={suggestRef}>
           <label className="text-xs text-white/50 block mb-1">施設名</label>
-          <input
-            type="text"
-            value={form.facilityName}
-            onChange={e => set('facilityName', e.target.value)}
-            placeholder="森の湯"
-            className="w-full rounded-xl px-3 py-2 text-sm text-white/80 outline-none placeholder-white/20"
-            style={{ border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)' }}
-          />
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30 pointer-events-none" />
+            <input
+              type="text"
+              value={form.facilityName}
+              onChange={e => handleFacilityInput(e.target.value)}
+              onFocus={() => form.facilityName && setShowSuggestions(suggestions.length > 0)}
+              placeholder="施設名を入力して検索..."
+              autoComplete="off"
+              className="w-full rounded-xl pl-8 pr-3 py-2 text-sm text-white/80 outline-none placeholder-white/20"
+              style={{ border: `1px solid ${facilityId ? 'rgba(124,179,66,0.5)' : 'rgba(255,255,255,0.12)'}`, background: 'rgba(255,255,255,0.05)' }}
+            />
+            {facilityId && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-[#7cb342] font-medium">✓ 登録済み</span>
+            )}
+          </div>
+
+          {/* サジェストドロップダウン */}
+          {showSuggestions && (
+            <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden"
+              style={{ background: 'rgba(10,20,8,0.96)', border: '1px solid rgba(124,179,66,0.25)', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+              {suggestions.map(f => (
+                <button key={f.id} type="button"
+                  onMouseDown={() => selectFacility(f)}
+                  className="w-full flex items-start gap-2 px-3 py-2.5 text-left hover:bg-white/5 transition-colors">
+                  <MapPin className="w-3.5 h-3.5 text-[#7cb342] shrink-0 mt-0.5" />
+                  <div className="min-w-0">
+                    <p className="text-sm text-white/85 font-medium truncate">{f.name}</p>
+                    {(f.city || f.prefecture) && (
+                      <p className="text-[10px] text-white/40">{f.prefecture}{f.city ? ` ${f.city}` : ''}</p>
+                    )}
+                  </div>
+                </button>
+              ))}
+              {/* DBにない場合は新規追加ボタン */}
+              <button type="button"
+                onMouseDown={handleAddNewFacility}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-left border-t hover:bg-white/5 transition-colors"
+                style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+                <Plus className="w-3.5 h-3.5 text-[#7cb342] shrink-0" />
+                <span className="text-sm text-[#7cb342]">「{form.facilityName}」を新しく追加</span>
+              </button>
+            </div>
+          )}
         </div>
         <div>
           <label className="text-xs text-white/50 block mb-1">メモ（任意）</label>
