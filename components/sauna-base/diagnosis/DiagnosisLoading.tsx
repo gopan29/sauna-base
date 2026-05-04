@@ -33,7 +33,6 @@ export function DiagnosisLoading({ onDone }: { onDone: () => void }) {
 
         {/* スピナー */}
         <div className="relative w-28 h-28 mb-8">
-          {/* 外リング */}
           <div
             className="absolute inset-0 rounded-full animate-spin"
             style={{
@@ -41,37 +40,26 @@ export function DiagnosisLoading({ onDone }: { onDone: () => void }) {
               padding: '3px',
             }}
           >
-            <div
-              className="w-full h-full rounded-full"
-              style={{ background: '#0a1a08' }}
-            />
+            <div className="w-full h-full rounded-full bg-[#EFE8DD] lg:bg-[#0a1a08]" />
           </div>
-          {/* 内側グロー */}
           <div
             className="absolute inset-3 rounded-full animate-pulse"
-            style={{
-              background: 'radial-gradient(circle, rgba(165,214,58,0.15) 0%, transparent 70%)',
-            }}
+            style={{ background: 'radial-gradient(circle, rgba(165,214,58,0.15) 0%, transparent 70%)' }}
           />
-          {/* アイコン */}
           <div className="absolute inset-0 flex items-center justify-center">
             <Leaf className="w-10 h-10" style={{ color: '#a5d63a' }} />
           </div>
-          {/* 外グロー */}
           <div
             className="absolute -inset-2 rounded-full animate-pulse"
-            style={{
-              background: 'radial-gradient(circle, rgba(165,214,58,0.12) 0%, transparent 70%)',
-            }}
+            style={{ background: 'radial-gradient(circle, rgba(165,214,58,0.12) 0%, transparent 70%)' }}
           />
         </div>
 
         {/* テキスト */}
-        <p className="text-base font-semibold text-white mb-2">分析中...</p>
+        <p className="text-base font-semibold mb-2 text-[#1a2a10] lg:text-white">分析中...</p>
         <p
           key={stepIndex}
-          className="text-sm text-center transition-opacity duration-300"
-          style={{ color: 'rgba(165,214,58,0.7)' }}
+          className="text-sm text-center transition-opacity duration-300 text-[#4d8a28] lg:text-[#a5d63a]/70"
         >
           {steps[stepIndex]}
         </p>
@@ -82,11 +70,7 @@ export function DiagnosisLoading({ onDone }: { onDone: () => void }) {
             <div
               key={i}
               className="w-1.5 h-1.5 rounded-full animate-bounce"
-              style={{
-                background: '#a5d63a',
-                opacity: 0.6,
-                animationDelay: `${i * 0.15}s`,
-              }}
+              style={{ background: '#a5d63a', opacity: 0.6, animationDelay: `${i * 0.15}s` }}
             />
           ))}
         </div>

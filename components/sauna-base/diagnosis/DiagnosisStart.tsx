@@ -17,7 +17,7 @@ export function DiagnosisStart({ onStart }: { onStart: () => void }) {
           >
             <Leaf className="w-10 h-10 text-white" />
           </div>
-          <p className="text-xs tracking-[0.25em] uppercase" style={{ color: 'rgba(165,214,58,0.7)' }}>
+          <p className="text-xs tracking-[0.25em] uppercase text-[#4d8a28] lg:text-[#a5d63a]/70">
             SAUNA BASE
           </p>
         </div>
@@ -34,11 +34,11 @@ export function DiagnosisStart({ onStart }: { onStart: () => void }) {
           }}
         >
           <div className="text-center mb-6">
-            <p className="text-xs tracking-widest uppercase mb-2" style={{ color: 'rgba(165,214,58,0.65)' }}>
+            <p className="text-xs tracking-widest uppercase mb-2 text-[#4d8a28] lg:text-[#a5d63a]/65">
               Diagnosis
             </p>
-            <h1 className="text-2xl font-bold text-white mb-1">サウナー診断</h1>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <h1 className="text-2xl font-bold mb-1 text-[#1a2a10] lg:text-white">サウナー診断</h1>
+            <p className="text-sm text-[#1a2a10]/60 lg:text-white/50">
               あなただけの TOTONOI CODE を発見しよう
             </p>
           </div>
@@ -57,7 +57,7 @@ export function DiagnosisStart({ onStart }: { onStart: () => void }) {
                 >
                   <Icon className="w-4 h-4" style={{ color: '#a5d63a' }} />
                 </div>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>{text}</p>
+                <p className="text-xs text-[#1a2a10]/70 lg:text-white/65">{text}</p>
               </div>
             ))}
           </div>
@@ -78,8 +78,7 @@ export function DiagnosisStart({ onStart }: { onStart: () => void }) {
         <div className="text-center">
           <Link
             href="/"
-            className="text-xs"
-            style={{ color: 'rgba(255,255,255,0.28)' }}
+            className="text-xs text-[#1a2a10]/40 lg:text-white/28"
           >
             スキップしてダッシュボードへ
           </Link>

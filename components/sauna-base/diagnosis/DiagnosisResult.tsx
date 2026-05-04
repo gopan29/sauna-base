@@ -40,7 +40,7 @@ export function DiagnosisResult({
             boxShadow: '0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.12)',
           }}
         >
-          <p className="text-[10px] tracking-[0.3em] uppercase mb-3" style={{ color: 'rgba(255,255,255,0.38)' }}>
+          <p className="text-[10px] tracking-[0.3em] uppercase mb-3 text-[#1a2a10]/40 lg:text-white/38">
             Your TOTONOI CODE
           </p>
 
@@ -67,7 +67,7 @@ export function DiagnosisResult({
             style={{
               background: 'rgba(165,214,58,0.15)',
               border: '1px solid rgba(165,214,58,0.3)',
-              color: '#a5d63a',
+              color: '#4d8a28',
               letterSpacing: '0.05em',
             }}
           >
@@ -75,7 +75,7 @@ export function DiagnosisResult({
           </div>
 
           {/* 説明 */}
-          <p className="text-xs leading-relaxed text-left" style={{ color: 'rgba(255,255,255,0.62)' }}>
+          <p className="text-xs leading-relaxed text-left text-[#1a2a10]/65 lg:text-white/62">
             {profile.description}
           </p>
         </div>
@@ -87,8 +87,8 @@ export function DiagnosisResult({
             background: 'rgba(255,255,255,0.06)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+            border: '1px solid rgba(0,0,0,0.06)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
           }}
         >
           <div className="space-y-3">
@@ -101,10 +101,10 @@ export function DiagnosisResult({
                   <Icon className="w-4 h-4" style={{ color }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span className="text-[10px] font-bold tracking-widest mr-2" style={{ color: `${color}bb` }}>
+                  <span className="text-[10px] font-bold tracking-widest mr-2" style={{ color: `${color}cc` }}>
                     {label}
                   </span>
-                  <span className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.82)' }}>
+                  <span className="text-xs font-semibold text-[#1a2a10]/80 lg:text-white/82">
                     {profile[key]} — {(labelMap[key] as Record<string, string>)[profile[key]]}
                   </span>
                 </div>
@@ -121,24 +121,24 @@ export function DiagnosisResult({
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: '1px solid rgba(165,214,58,0.18)',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.25)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
           }}
         >
-          <p className="text-xs font-bold mb-3" style={{ color: 'rgba(165,214,58,0.8)' }}>おすすめ初期設定</p>
+          <p className="text-xs font-bold mb-3 text-[#4d8a28]">おすすめ初期設定</p>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { label: 'サウナ温度',  value: profile.recommendedSaunaTemp },
-              { label: '水風呂温度',  value: profile.recommendedWaterTemp },
+              { label: 'サウナ温度',   value: profile.recommendedSaunaTemp },
+              { label: '水風呂温度',   value: profile.recommendedWaterTemp },
               { label: '推奨セット数', value: profile.recommendedSets },
               { label: '休憩スタイル', value: profile.recommendedRestStyle },
             ].map(({ label, value }) => (
               <div
                 key={label}
                 className="rounded-xl p-2.5"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(0,0,0,0.06)' }}
               >
-                <p className="text-[9px] mb-0.5" style={{ color: 'rgba(255,255,255,0.38)' }}>{label}</p>
-                <p className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>{value}</p>
+                <p className="text-[9px] mb-0.5 text-[#1a2a10]/45 lg:text-white/38">{label}</p>
+                <p className="text-xs font-semibold text-[#1a2a10]/85 lg:text-white/85">{value}</p>
               </div>
             ))}
           </div>

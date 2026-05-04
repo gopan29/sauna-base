@@ -2,11 +2,11 @@ export function DiagnosisProgress({ current, total }: { current: number; total: 
   const pct = (current / total) * 100
   return (
     <div className="w-full">
-      <div className="flex justify-between text-[10px] mb-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
+      <div className="flex justify-between text-[10px] mb-1.5 text-[#1a2a10]/45 lg:text-white/45">
         <span>Q{current} / {total}</span>
         <span>{Math.round(pct)}%</span>
       </div>
-      <div className="h-1 rounded-full w-full" style={{ background: 'rgba(255,255,255,0.12)' }}>
+      <div className="h-1 rounded-full w-full" style={{ background: 'rgba(0,0,0,0.1)' }}>
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{

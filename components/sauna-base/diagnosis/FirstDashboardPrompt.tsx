@@ -19,18 +19,18 @@ export function FirstDashboardPrompt({ profile }: { profile: TotonoiProfile }) {
         </div>
 
         {/* メッセージ */}
-        <h2 className="text-2xl font-bold text-white mb-2">ようこそ、SAUNA BASE へ</h2>
+        <h2 className="text-2xl font-bold mb-2 text-[#1a2a10] lg:text-white">ようこそ、SAUNA BASE へ</h2>
         <div
           className="inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-4"
           style={{
             background: 'rgba(165,214,58,0.12)',
             border: '1px solid rgba(165,214,58,0.3)',
-            color: '#a5d63a',
+            color: '#4d8a28',
           }}
         >
           TOTONOI CODE : {profile.code}
         </div>
-        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
+        <p className="text-sm mb-8 text-[#1a2a10]/55 lg:text-white/50">
           最初のサウナ記録をつけて、<br />
           あなたのととのいをスコア化しましょう。
         </p>
@@ -54,8 +54,8 @@ export function FirstDashboardPrompt({ profile }: { profile: TotonoiProfile }) {
               <PenLine className="w-5 h-5" style={{ color: '#a5d63a' }} />
             </div>
             <div>
-              <p className="text-sm font-bold text-white">サウナ記録を始める</p>
-              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.42)' }}>
+              <p className="text-sm font-bold text-[#1a2a10] lg:text-white">サウナ記録を始める</p>
+              <p className="text-[10px] text-[#1a2a10]/45 lg:text-white/42">
                 施設・セット数・温度・ととのい度を記録
               </p>
             </div>
@@ -75,8 +75,7 @@ export function FirstDashboardPrompt({ profile }: { profile: TotonoiProfile }) {
 
         <Link
           href="/"
-          className="text-xs"
-          style={{ color: 'rgba(255,255,255,0.28)' }}
+          className="text-xs text-[#1a2a10]/35 lg:text-white/28"
         >
           まずはダッシュボードを見る
         </Link>

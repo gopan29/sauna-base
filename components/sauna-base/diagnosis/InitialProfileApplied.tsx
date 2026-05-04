@@ -9,8 +9,8 @@ export function InitialProfileApplied({
   onContinue: () => void
 }) {
   const settings = [
-    { icon: Thermometer, label: 'サウナ温度',  value: profile.recommendedSaunaTemp, color: '#f97316' },
-    { icon: Droplets,    label: '水風呂温度',  value: profile.recommendedWaterTemp,  color: '#38bdf8' },
+    { icon: Thermometer, label: 'サウナ温度',   value: profile.recommendedSaunaTemp, color: '#f97316' },
+    { icon: Droplets,    label: '水風呂温度',   value: profile.recommendedWaterTemp,  color: '#38bdf8' },
     { icon: BarChart2,   label: '推奨セット数', value: profile.recommendedSets,       color: '#a5d63a' },
     { icon: Wind,        label: '休憩スタイル', value: profile.recommendedRestStyle,  color: '#c084fc' },
   ]
@@ -31,9 +31,9 @@ export function InitialProfileApplied({
           >
             <CheckCircle className="w-8 h-8" style={{ color: '#a5d63a' }} />
           </div>
-          <h2 className="text-xl font-bold text-white mb-1">初期設定が反映されました</h2>
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            TOTONOI CODE <span style={{ color: '#a5d63a', fontWeight: 700 }}>{profile.code}</span> に基づいて設定しました
+          <h2 className="text-xl font-bold mb-1 text-[#1a2a10] lg:text-white">初期設定が反映されました</h2>
+          <p className="text-xs text-[#1a2a10]/50 lg:text-white/45">
+            TOTONOI CODE <span className="font-bold" style={{ color: '#4d8a28' }}>{profile.code}</span> に基づいて設定しました
           </p>
         </div>
 
@@ -58,8 +58,8 @@ export function InitialProfileApplied({
                   <Icon className="w-4 h-4" style={{ color }} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>{label}</p>
-                  <p className="text-sm font-semibold text-white">{value}</p>
+                  <p className="text-[10px] text-[#1a2a10]/45 lg:text-white/40">{label}</p>
+                  <p className="text-sm font-semibold text-[#1a2a10] lg:text-white">{value}</p>
                 </div>
                 <CheckCircle className="w-4 h-4 shrink-0" style={{ color: '#a5d63a' }} />
               </div>

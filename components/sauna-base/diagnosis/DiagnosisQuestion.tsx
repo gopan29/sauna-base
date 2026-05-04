@@ -45,10 +45,10 @@ export function DiagnosisQuestion({
             boxShadow: '0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)',
           }}
         >
-          <p className="text-xs mb-3 tracking-widest" style={{ color: 'rgba(165,214,58,0.65)' }}>
+          <p className="text-xs mb-3 tracking-widest text-[#4d8a28] lg:text-[#a5d63a]/65">
             Q{questionIndex + 1}
           </p>
-          <h2 className="text-lg font-bold text-white leading-snug">
+          <h2 className="text-lg font-bold leading-snug text-[#1a2a10] lg:text-white">
             {question.text}
           </h2>
         </div>
@@ -64,32 +64,33 @@ export function DiagnosisQuestion({
                 disabled={selected !== null}
                 className="w-full text-left rounded-2xl p-4 transition-all active:scale-[0.98] flex items-start gap-3.5"
                 style={{
-                  background: isSelected
-                    ? 'rgba(165,214,58,0.18)'
-                    : 'rgba(255,255,255,0.06)',
+                  background: isSelected ? 'rgba(165,214,58,0.18)' : 'rgba(255,255,255,0.06)',
                   backdropFilter: 'blur(16px)',
                   WebkitBackdropFilter: 'blur(16px)',
-                  border: isSelected
-                    ? '1px solid rgba(165,214,58,0.5)'
-                    : '1px solid rgba(255,255,255,0.12)',
-                  boxShadow: isSelected
-                    ? '0 0 20px rgba(165,214,58,0.2)'
-                    : '0 2px 12px rgba(0,0,0,0.2)',
+                  border: isSelected ? '1px solid rgba(165,214,58,0.5)' : '1px solid rgba(0,0,0,0.08)',
+                  boxShadow: isSelected ? '0 0 20px rgba(165,214,58,0.2)' : '0 2px 12px rgba(0,0,0,0.08)',
                 }}
               >
                 <span
-                  className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5"
-                  style={{
-                    background: isSelected ? 'rgba(165,214,58,0.3)' : 'rgba(255,255,255,0.1)',
-                    color: isSelected ? '#a5d63a' : 'rgba(255,255,255,0.5)',
-                    border: isSelected ? '1px solid rgba(165,214,58,0.4)' : '1px solid rgba(255,255,255,0.15)',
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
+                    isSelected ? '' : 'text-[#1a2a10]/50 lg:text-white/50'
+                  }`}
+                  style={isSelected ? {
+                    background: 'rgba(165,214,58,0.3)',
+                    color: '#a5d63a',
+                    border: '1px solid rgba(165,214,58,0.4)',
+                  } : {
+                    background: 'rgba(0,0,0,0.06)',
+                    border: '1px solid rgba(0,0,0,0.1)',
                   }}
                 >
                   {opt.id}
                 </span>
                 <span
-                  className="text-sm leading-relaxed"
-                  style={{ color: isSelected ? '#a5d63a' : 'rgba(255,255,255,0.78)' }}
+                  className={`text-sm leading-relaxed ${
+                    isSelected ? '' : 'text-[#1a2a10]/78 lg:text-white/78'
+                  }`}
+                  style={isSelected ? { color: '#a5d63a' } : undefined}
                 >
                   {opt.text}
                 </span>
