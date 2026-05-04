@@ -19,7 +19,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="ja" className="h-full">
       <body className="min-h-full sauna-bg text-[#e8f5e0]">
         <AuthProvider initialUser={user} initialDisplayName={displayName}>
-          <div className="flex min-h-screen">
+          <div className="flex min-h-screen items-start">
             <Sidebar />
             <main className="flex-1 min-w-0 pb-20 lg:pb-0 overflow-x-hidden">
               {children}
