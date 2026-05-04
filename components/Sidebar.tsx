@@ -25,6 +25,8 @@ export function Sidebar() {
   const [pending, startTransition] = useTransition()
   const { user, displayName } = useAuth()
 
+  if (path.startsWith('/admin')) return null
+
   const handleSignOut = () => {
     startTransition(async () => {
       await signOut()
