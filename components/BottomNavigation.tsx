@@ -15,7 +15,7 @@ const items = [
 export function BottomNavigation() {
   const path = usePathname()
 
-  if (path.startsWith('/admin')) return null
+  if (path.startsWith('/admin') || path.startsWith('/onboarding')) return null
 
   return (
     <nav

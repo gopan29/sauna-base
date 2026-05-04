@@ -25,7 +25,7 @@ export function Sidebar() {
   const [pending, startTransition] = useTransition()
   const { user, displayName } = useAuth()
 
-  if (path.startsWith('/admin')) return null
+  if (path.startsWith('/admin') || path.startsWith('/onboarding')) return null
 
   const handleSignOut = () => {
     startTransition(async () => {
