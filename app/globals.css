@@ -13,6 +13,7 @@
   --color-sauna-gold:      #f59e0b;
 }
 
+/* ===== ベース ===== */
 html, body {
   background-color: #0a1a08;
   color: #e8f5e0;
@@ -20,34 +21,17 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ===== 背景 ===== */
-
-/* デスクトップ: フォレストグリーン */
+/* ===== デスクトップ背景: フォレストグリーン ===== */
 .sauna-bg {
   background:
-    radial-gradient(ellipse at 20% 0%,   rgba(80,130,40,0.22)  0%, transparent 50%),
-    radial-gradient(ellipse at 85% 90%,  rgba(40,90,20,0.18)   0%, transparent 50%),
-    radial-gradient(ellipse at 60% 50%,  rgba(20,50,10,0.15)   0%, transparent 60%),
+    radial-gradient(ellipse at 20% 0%,  rgba(80,130,40,0.22)  0%, transparent 50%),
+    radial-gradient(ellipse at 85% 90%, rgba(40,90,20,0.18)   0%, transparent 50%),
+    radial-gradient(ellipse at 60% 50%, rgba(20,50,10,0.15)   0%, transparent 60%),
     linear-gradient(160deg, #0d2410 0%, #0a1a08 45%, #061206 100%);
   min-height: 100vh;
 }
 
-/* スマホ: 薄い緑 → ニュートラルダーク寄り */
-@media (max-width: 1023px) {
-  html, body {
-    background-color: #0d1318;
-  }
-
-  .sauna-bg {
-    background:
-      radial-gradient(ellipse at 15% 0%,  rgba(80,115,65,0.10) 0%, transparent 55%),
-      radial-gradient(ellipse at 88% 95%, rgba(55,80,50,0.08)  0%, transparent 55%),
-      linear-gradient(165deg, #131c19 0%, #0e1618 50%, #0b1316 100%);
-  }
-}
-
-/* ===== Glassmorphism ===== */
-
+/* ===== Glassmorphism (デスクトップ) ===== */
 .glass {
   background: linear-gradient(
     135deg,
@@ -79,25 +63,10 @@ html, body {
     inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
-/* インタラクティブ glasss ホバー */
-.glass-interactive {
-  transition: background 0.2s, box-shadow 0.2s;
-}
-.glass-interactive:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(255,255,255,0.14) 0%,
-    rgba(255,255,255,0.07) 100%
-  );
-  box-shadow:
-    0 8px 32px rgba(0,0,0,0.28),
-    inset 0 1px 0 rgba(255,255,255,0.18);
-}
-
-/* ===== スクロールバー ===== */
+/* ===== スクロールバー (デスクトップ) ===== */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(124,179,66,0.3); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(124,179,66,0.30); border-radius: 2px; }
 
 /* ===== スライダー ===== */
 input[type="range"] {
@@ -116,4 +85,89 @@ input[type="range"]::-webkit-slider-thumb {
   background: #7cb342;
   cursor: pointer;
   box-shadow: 0 0 8px rgba(124,179,66,0.45);
+}
+
+
+/* ============================================================
+   スマホ ライトテーマ: #EFE8DD + グリーン差し色
+   (デスクトップSidebar は lg:flex なのでここの影響なし)
+   ============================================================ */
+@media (max-width: 1023px) {
+
+  /* --- ベース色 --- */
+  html, body {
+    background-color: #EFE8DD;
+    color: #2c2016;
+  }
+
+  /* --- 背景グラデーション: ウォームクリーム + 薄い緑グロー --- */
+  .sauna-bg {
+    background:
+      radial-gradient(ellipse at 15% 0%,  rgba(100,160,55,0.13) 0%, transparent 55%),
+      radial-gradient(ellipse at 88% 95%, rgba(80,130,45,0.09)  0%, transparent 55%),
+      linear-gradient(165deg, #f5eee6 0%, #efe8dd 50%, #e8e0d4 100%);
+  }
+
+  /* --- ガラスカード: ライトフロスト --- */
+  .glass {
+    background: rgba(255,255,255,0.60);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    border: 1px solid rgba(255,255,255,0.88);
+    border-radius: 1rem;
+    box-shadow:
+      0 4px 20px rgba(44,32,22,0.09),
+      inset 0 1px 0 rgba(255,255,255,0.96);
+  }
+
+  .glass-dark {
+    background: rgba(239,232,221,0.68);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid rgba(255,255,255,0.76);
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(44,32,22,0.07);
+  }
+
+  /* --- テキストカラー: text-white/* → ウォームダークブラウン --- */
+  [class*="text-white/20"] { color: rgba(44,32,22,0.22) !important; }
+  [class*="text-white/25"] { color: rgba(44,32,22,0.27) !important; }
+  [class*="text-white/30"] { color: rgba(44,32,22,0.32) !important; }
+  [class*="text-white/35"] { color: rgba(44,32,22,0.37) !important; }
+  [class*="text-white/38"] { color: rgba(44,32,22,0.40) !important; }
+  [class*="text-white/40"] { color: rgba(44,32,22,0.42) !important; }
+  [class*="text-white/45"] { color: rgba(44,32,22,0.48) !important; }
+  [class*="text-white/50"] { color: rgba(44,32,22,0.54) !important; }
+  [class*="text-white/55"] { color: rgba(44,32,22,0.58) !important; }
+  [class*="text-white/60"] { color: rgba(44,32,22,0.62) !important; }
+  [class*="text-white/65"] { color: rgba(44,32,22,0.67) !important; }
+  [class*="text-white/70"] { color: rgba(44,32,22,0.72) !important; }
+  [class*="text-white/75"] { color: rgba(44,32,22,0.77) !important; }
+  [class*="text-white/80"] { color: rgba(44,32,22,0.82) !important; }
+  [class*="text-white/85"] { color: rgba(44,32,22,0.87) !important; }
+  [class*="text-white/90"] { color: rgba(44,32,22,0.92) !important; }
+
+  /* 差し色グリーン: ライト背景用に少し深く */
+  [class*="text-[#a5d63a]"] { color: #4d8a28 !important; }
+  [class*="text-[#7cb342]"] { color: #4d8a28 !important; }
+  [class*="text-[#8bc34a]"] { color: #4d8a28 !important; }
+
+  /* --- プレースホルダー --- */
+  [class*="placeholder-white/20"]::placeholder {
+    color: rgba(44,32,22,0.32) !important;
+  }
+
+  /* --- ボーダーカラー --- */
+  [class*="border-white/6"]  { border-color: rgba(44,32,22,0.08) !important; }
+  [class*="border-white/15"] { border-color: rgba(44,32,22,0.13) !important; }
+  [class*="border-white/20"] { border-color: rgba(44,32,22,0.16) !important; }
+  [class*="border-white/30"] { border-color: rgba(44,32,22,0.22) !important; }
+
+  /* --- スライダー: クリーム背景に合わせて --- */
+  input[type="range"] {
+    background: rgba(44,32,22,0.15);
+  }
+
+  /* --- スクロールバー --- */
+  ::-webkit-scrollbar-thumb { background: rgba(77,138,40,0.40); }
 }
