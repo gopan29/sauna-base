@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Leaf, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase-browser'
 
 type Tab = 'login' | 'signup'
@@ -72,171 +72,181 @@ export default function LoginPage() {
   const switchTab = (t: Tab) => { setTab(t); resetMessage() }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* 背景グロー */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full opacity-[0.07]"
-          style={{ background: 'radial-gradient(circle, #7cb342 0%, transparent 70%)', filter: 'blur(80px)' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full opacity-[0.05]"
-          style={{ background: 'radial-gradient(circle, #a5d63a 0%, transparent 70%)', filter: 'blur(60px)' }} />
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4">
 
-      <div className="w-full max-w-sm relative z-10">
+      <div className="w-full max-w-sm">
 
         {/* ロゴ */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center group">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-4 transition-transform group-hover:scale-[1.03]"
+            <div
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 transition-transform group-hover:scale-[1.03]"
               style={{
                 background: 'linear-gradient(135deg, #7cb342 0%, #4a7c20 100%)',
-                boxShadow: '0 12px 40px rgba(124,179,66,0.45)',
-              }}>
-              <span className="text-4xl">♨️</span>
+                boxShadow: '0 8px 32px rgba(124,179,66,0.40)',
+              }}
+            >
+              <Leaf className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold tracking-wide" style={{ color: 'rgba(255,255,255,0.92)' }}>
+            <h1 className="text-2xl font-bold tracking-wide" style={{ color: '#1a2a10' }}>
               SAUNA BASE
             </h1>
-            <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.38)' }}>
+            <p className="text-xs mt-1" style={{ color: 'rgba(26,42,16,0.45)' }}>
               あなたのととのいを点数化する
             </p>
           </Link>
         </div>
 
-        {/* タブ切り替え */}
-        <div className="glass rounded-2xl p-1.5 flex mb-4">
-          {(['login', 'signup'] as const).map(t => (
-            <button key={t}
-              onClick={() => switchTab(t)}
-              className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
-              style={{
-                background: tab === t ? 'rgba(124,179,66,0.2)' : 'transparent',
-                color: tab === t ? '#a5d63a' : 'rgba(255,255,255,0.38)',
-                border: tab === t ? '1px solid rgba(124,179,66,0.35)' : '1px solid transparent',
-              }}
-            >
-              {t === 'login' ? 'ログイン' : '新規登録'}
-            </button>
-          ))}
-        </div>
+        {/* カード */}
+        <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', boxShadow: '0 4px 32px rgba(0,0,0,0.10)', border: '1px solid rgba(0,0,0,0.07)' }}>
 
-        {/* フォームカード */}
-        <div className="glass rounded-2xl p-6">
-
-          {tab === 'login' ? (
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-3">
-                <InputField
-                  icon={<Mail className="w-4 h-4" />}
-                  label="メールアドレス"
-                  type="email"
-                  value={email}
-                  onChange={setEmail}
-                  placeholder="your@email.com"
-                />
-                <PasswordField
-                  label="パスワード"
-                  value={password}
-                  onChange={setPassword}
-                  show={showPassword}
-                  onToggle={() => setShowPassword(p => !p)}
-                />
-              </div>
-
-              {message && <StatusMessage text={message} type={messageType} />}
-
-              <button type="submit" disabled={loading}
-                className="w-full py-3.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98] disabled:opacity-60"
+          {/* タブ */}
+          <div className="flex border-b" style={{ borderColor: 'rgba(0,0,0,0.07)' }}>
+            {(['login', 'signup'] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => switchTab(t)}
+                className="flex-1 py-3.5 text-sm font-semibold transition-colors"
                 style={{
-                  background: 'linear-gradient(135deg, #7cb342 0%, #4a7c20 100%)',
-                  boxShadow: '0 4px 24px rgba(124,179,66,0.38)',
-                  color: '#fff',
-                }}>
-                {loading ? 'ログイン中...' : 'ログイン'}
+                  color: tab === t ? '#4a7c20' : 'rgba(26,42,16,0.35)',
+                  borderBottom: tab === t ? '2px solid #7cb342' : '2px solid transparent',
+                  background: 'transparent',
+                }}
+              >
+                {t === 'login' ? 'ログイン' : '新規登録'}
               </button>
+            ))}
+          </div>
 
-              <div className="text-center">
-                <button type="button"
-                  className="text-xs transition-colors"
-                  style={{ color: 'rgba(255,255,255,0.32)' }}
-                  onMouseOver={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.55)')}
-                  onMouseOut={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.32)')}>
-                  パスワードをお忘れですか？
-                </button>
-              </div>
-            </form>
+          {/* フォーム */}
+          <div className="p-6">
 
-          ) : (
-            <form onSubmit={handleSignUp} className="space-y-4">
-              {/* 登録フォームの特典アピール */}
-              <div className="rounded-xl p-3 flex items-start gap-2.5"
-                style={{ background: 'rgba(124,179,66,0.07)', border: '1px solid rgba(124,179,66,0.2)' }}>
-                <span className="text-lg shrink-0 mt-0.5">🎉</span>
-                <div>
-                  <p className="text-xs font-semibold" style={{ color: '#a5d63a' }}>登録無料・30秒で完了</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                    ととのいスコア記録・AI分析・統計グラフがすべて使えます
-                  </p>
+            {tab === 'login' ? (
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-3">
+                  <InputField
+                    icon={<Mail className="w-4 h-4" />}
+                    label="メールアドレス"
+                    type="email"
+                    value={email}
+                    onChange={setEmail}
+                    placeholder="your@email.com"
+                  />
+                  <PasswordField
+                    label="パスワード"
+                    value={password}
+                    onChange={setPassword}
+                    show={showPassword}
+                    onToggle={() => setShowPassword(p => !p)}
+                  />
                 </div>
-              </div>
 
-              <div className="space-y-3">
-                <InputField
-                  icon={<User className="w-4 h-4" />}
-                  label="表示名"
-                  type="text"
-                  value={displayName}
-                  onChange={setDisplayName}
-                  placeholder="サウナ太郎"
-                  required={false}
-                />
-                <InputField
-                  icon={<Mail className="w-4 h-4" />}
-                  label="メールアドレス"
-                  type="email"
-                  value={email}
-                  onChange={setEmail}
-                  placeholder="your@email.com"
-                />
-                <PasswordField
-                  label="パスワード（8文字以上）"
-                  value={password}
-                  onChange={setPassword}
-                  show={showPassword}
-                  onToggle={() => setShowPassword(p => !p)}
-                />
-                <PasswordField
-                  label="パスワード（確認）"
-                  value={confirmPassword}
-                  onChange={setConfirmPassword}
-                  show={showPassword}
-                  onToggle={() => setShowPassword(p => !p)}
-                />
-              </div>
+                {message && <StatusMessage text={message} type={messageType} />}
 
-              {message && <StatusMessage text={message} type={messageType} />}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98] disabled:opacity-60"
+                  style={{
+                    background: 'linear-gradient(135deg, #7cb342 0%, #4a7c20 100%)',
+                    boxShadow: '0 4px 16px rgba(124,179,66,0.35)',
+                    color: '#fff',
+                  }}
+                >
+                  {loading ? 'ログイン中...' : 'ログイン'}
+                </button>
 
-              <button type="submit" disabled={loading}
-                className="w-full py-3.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{
-                  background: 'linear-gradient(135deg, #7cb342 0%, #4a7c20 100%)',
-                  boxShadow: '0 4px 24px rgba(124,179,66,0.38)',
-                  color: '#fff',
-                }}>
-                {loading ? '登録中...' : '無料ではじめる'}
-              </button>
+                <div className="text-center">
+                  <button
+                    type="button"
+                    className="text-xs"
+                    style={{ color: 'rgba(26,42,16,0.35)' }}
+                  >
+                    パスワードをお忘れですか？
+                  </button>
+                </div>
+              </form>
 
-              <p className="text-[10px] text-center" style={{ color: 'rgba(255,255,255,0.22)' }}>
-                登録することで利用規約およびプライバシーポリシーに同意したものとみなします。
-              </p>
-            </form>
-          )}
+            ) : (
+              <form onSubmit={handleSignUp} className="space-y-4">
+                {/* 特典アピール */}
+                <div
+                  className="rounded-xl p-3 flex items-start gap-2.5"
+                  style={{ background: 'rgba(124,179,66,0.07)', border: '1px solid rgba(124,179,66,0.22)' }}
+                >
+                  <Sparkles className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#5a9e28' }} />
+                  <div>
+                    <p className="text-xs font-semibold" style={{ color: '#4a7c20' }}>登録無料・30秒で完了</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: 'rgba(26,42,16,0.50)' }}>
+                      ととのいスコア記録・AI分析・統計グラフがすべて使えます
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <InputField
+                    icon={<User className="w-4 h-4" />}
+                    label="表示名"
+                    type="text"
+                    value={displayName}
+                    onChange={setDisplayName}
+                    placeholder="サウナ太郎"
+                    required={false}
+                  />
+                  <InputField
+                    icon={<Mail className="w-4 h-4" />}
+                    label="メールアドレス"
+                    type="email"
+                    value={email}
+                    onChange={setEmail}
+                    placeholder="your@email.com"
+                  />
+                  <PasswordField
+                    label="パスワード（8文字以上）"
+                    value={password}
+                    onChange={setPassword}
+                    show={showPassword}
+                    onToggle={() => setShowPassword(p => !p)}
+                  />
+                  <PasswordField
+                    label="パスワード（確認）"
+                    value={confirmPassword}
+                    onChange={setConfirmPassword}
+                    show={showPassword}
+                    onToggle={() => setShowPassword(p => !p)}
+                  />
+                </div>
+
+                {message && <StatusMessage text={message} type={messageType} />}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98] disabled:opacity-60"
+                  style={{
+                    background: 'linear-gradient(135deg, #7cb342 0%, #4a7c20 100%)',
+                    boxShadow: '0 4px 16px rgba(124,179,66,0.35)',
+                    color: '#fff',
+                  }}
+                >
+                  {loading ? '登録中...' : '無料ではじめる'}
+                </button>
+
+                <p className="text-[10px] text-center" style={{ color: 'rgba(26,42,16,0.30)' }}>
+                  登録することで利用規約およびプライバシーポリシーに同意したものとみなします。
+                </p>
+              </form>
+            )}
+          </div>
         </div>
 
-        {/* ゲストに戻るリンク */}
+        {/* ゲストリンク */}
         <div className="text-center mt-5">
-          <Link href="/"
+          <Link
+            href="/"
             className="inline-flex items-center gap-1.5 text-xs transition-colors"
-            style={{ color: 'rgba(255,255,255,0.28)' }}>
+            style={{ color: 'rgba(26,42,16,0.35)' }}
+          >
             <ArrowLeft className="w-3 h-3" />
             ログインせずに見る
           </Link>
@@ -259,9 +269,9 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="text-xs block mb-1.5" style={{ color: 'rgba(255,255,255,0.48)' }}>{label}</label>
+      <label className="text-xs block mb-1.5 font-medium" style={{ color: 'rgba(26,42,16,0.55)' }}>{label}</label>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.28)' }}>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(26,42,16,0.30)' }}>
           {icon}
         </span>
         <input
@@ -272,12 +282,12 @@ function InputField({
           placeholder={placeholder}
           className="w-full rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none transition-colors"
           style={{
-            border: '1px solid rgba(255,255,255,0.12)',
-            background: 'rgba(255,255,255,0.05)',
-            color: 'rgba(255,255,255,0.82)',
+            border: '1px solid rgba(26,42,16,0.14)',
+            background: 'rgba(26,42,16,0.03)',
+            color: '#1a2a10',
           }}
-          onFocus={e => (e.currentTarget.style.borderColor = 'rgba(124,179,66,0.5)')}
-          onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+          onFocus={e => (e.currentTarget.style.borderColor = 'rgba(124,179,66,0.6)')}
+          onBlur={e => (e.currentTarget.style.borderColor = 'rgba(26,42,16,0.14)')}
         />
       </div>
     </div>
@@ -295,9 +305,9 @@ function PasswordField({
 }) {
   return (
     <div>
-      <label className="text-xs block mb-1.5" style={{ color: 'rgba(255,255,255,0.48)' }}>{label}</label>
+      <label className="text-xs block mb-1.5 font-medium" style={{ color: 'rgba(26,42,16,0.55)' }}>{label}</label>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.28)' }}>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(26,42,16,0.30)' }}>
           <Lock className="w-4 h-4" />
         </span>
         <input
@@ -308,16 +318,19 @@ function PasswordField({
           placeholder="••••••••"
           className="w-full rounded-xl pl-9 pr-10 py-2.5 text-sm outline-none transition-colors"
           style={{
-            border: '1px solid rgba(255,255,255,0.12)',
-            background: 'rgba(255,255,255,0.05)',
-            color: 'rgba(255,255,255,0.82)',
+            border: '1px solid rgba(26,42,16,0.14)',
+            background: 'rgba(26,42,16,0.03)',
+            color: '#1a2a10',
           }}
-          onFocus={e => (e.currentTarget.style.borderColor = 'rgba(124,179,66,0.5)')}
-          onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+          onFocus={e => (e.currentTarget.style.borderColor = 'rgba(124,179,66,0.6)')}
+          onBlur={e => (e.currentTarget.style.borderColor = 'rgba(26,42,16,0.14)')}
         />
-        <button type="button" onClick={onToggle}
+        <button
+          type="button"
+          onClick={onToggle}
           className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
-          style={{ color: 'rgba(255,255,255,0.28)' }}>
+          style={{ color: 'rgba(26,42,16,0.30)' }}
+        >
           {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
         </button>
       </div>
@@ -328,12 +341,14 @@ function PasswordField({
 function StatusMessage({ text, type }: { text: string; type: MessageType }) {
   const isSuccess = type === 'success'
   return (
-    <p className="text-xs text-center px-3 py-2.5 rounded-lg"
+    <p
+      className="text-xs text-center px-3 py-2.5 rounded-lg"
       style={{
-        background: isSuccess ? 'rgba(124,179,66,0.1)' : 'rgba(239,68,68,0.1)',
-        color: isSuccess ? '#a5d63a' : '#f87171',
-        border: `1px solid ${isSuccess ? 'rgba(124,179,66,0.3)' : 'rgba(239,68,68,0.3)'}`,
-      }}>
+        background: isSuccess ? 'rgba(124,179,66,0.08)' : 'rgba(239,68,68,0.08)',
+        color: isSuccess ? '#4a7c20' : '#dc2626',
+        border: `1px solid ${isSuccess ? 'rgba(124,179,66,0.25)' : 'rgba(239,68,68,0.25)'}`,
+      }}
+    >
       {text}
     </p>
   )
