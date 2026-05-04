@@ -2,14 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, PenLine, Sparkles, BarChart2, User } from 'lucide-react'
+import { Home, PenLine, Sparkles, BarChart2, User, Compass } from 'lucide-react'
 
 const items = [
-  { href: '/',        icon: Home,      label: 'ホーム' },
-  { href: '/record',  icon: PenLine,   label: '記録' },
-  { href: '/ai',      icon: Sparkles,  label: 'AI' },
-  { href: '/stats',   icon: BarChart2, label: '統計' },
-  { href: '/profile', icon: User,      label: 'マイページ' },
+  { href: '/',           icon: Home,      label: 'ホーム' },
+  { href: '/record',     icon: PenLine,   label: '記録' },
+  { href: '/ai',         icon: Sparkles,  label: 'AI' },
+  { href: '/stats',      icon: BarChart2, label: '統計' },
+  { href: '/profile',    icon: User,      label: 'マイページ' },
+  { href: '/onboarding', icon: Compass,   label: '診断' },
 ]
 
 export function BottomNavigation() {

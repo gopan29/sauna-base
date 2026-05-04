@@ -128,6 +128,16 @@ export default async function DashboardPage() {
   return (
     <div className="p-4 lg:p-6">
 
+      {/* 管理画面ショートカット */}
+      <div className="flex justify-end mb-3">
+        <Link href="/admin"
+          className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs text-white/45 hover:text-white/70 transition-colors"
+          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <Shield className="w-3.5 h-3.5" />
+          <span>管理画面</span>
+        </Link>
+      </div>
+
       {/* ゲストバナー */}
       {isGuest && (
         <div className="glass rounded-xl p-3 flex items-center gap-3 mb-5"
