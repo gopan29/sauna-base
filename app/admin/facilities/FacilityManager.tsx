@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useTransition, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { Search, Plus, Pencil, Trash2, Leaf, LogOut, X, Check } from 'lucide-react'
+import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { Search, Plus, Pencil, Trash2, Leaf, LogOut, X, Check, Building2, Users } from 'lucide-react'
 import {
   adminGetFacilities,
   adminUpdateFacility,
@@ -43,6 +44,7 @@ export function FacilityManager({
   prefectures: string[]
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
 
   const [facilities, setFacilities] = useState<Facility[]>(initialFacilities)
@@ -161,6 +163,26 @@ export function FacilityManager({
               管理画面
             </span>
           </div>
+          <nav className="flex items-center gap-1">
+            {[
+              { href: '/admin/facilities', icon: Building2, label: '施設管理' },
+              { href: '/admin/users', icon: Users, label: 'ユーザー管理' },
+            ].map(item => {
+              const active = pathname === item.href
+              return (
+                <Link key={item.href} href={item.href}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                  style={{
+                    background: active ? 'rgba(124,179,66,0.15)' : 'transparent',
+                    color: active ? '#4a7c20' : 'rgba(26,42,16,0.5)',
+                    fontWeight: active ? 600 : 400,
+                  }}>
+                  <item.icon className="w-3.5 h-3.5" />
+                  {item.label}
+                </Link>
+              )
+            })}
+          </nav>
           <button onClick={handleLogout}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors hover:bg-red-50"
             style={{ color: 'rgba(26,42,16,0.5)' }}>

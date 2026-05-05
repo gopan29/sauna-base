@@ -91,6 +91,49 @@ export async function adminCreateFacility(data: {
   return { data: result as FacilityRow }
 }
 
+export type UserRow = {
+  id: string
+  email: string
+  displayName: string | null
+  createdAt: string
+  lastSignInAt: string | null
+  typeName: string | null
+  totonoiCode: string | null
+  recordCount: number
+}
+
+export async function adminGetUsers(): Promise<UserRow[]> {
+  await requireAdminAuth()
+  const supabase = createAdminClient()
+
+  const [{ data: authData }, { data: profiles }, { data: saunaProfiles }, { data: recordData }] = await Promise.all([
+    supabase.auth.admin.listUsers({ perPage: 1000 }),
+    supabase.from('profiles').select('id, display_name'),
+    supabase.from('sauna_profiles').select('user_id, type_name, totonoi_code'),
+    supabase.from('sauna_records').select('user_id'),
+  ])
+
+  const profileMap = new Map((profiles ?? []).map(p => [p.id, p.display_name as string | null]))
+  const saunaProfileMap = new Map((saunaProfiles ?? []).map(p => [p.user_id, p]))
+  const recordCountMap = new Map<string, number>()
+  for (const r of (recordData ?? [])) {
+    recordCountMap.set(r.user_id, (recordCountMap.get(r.user_id) ?? 0) + 1)
+  }
+
+  return (authData?.users ?? [])
+    .map(u => ({
+      id: u.id,
+      email: u.email ?? '',
+      displayName: profileMap.get(u.id) ?? null,
+      createdAt: u.created_at,
+      lastSignInAt: u.last_sign_in_at ?? null,
+      typeName: (saunaProfileMap.get(u.id) as { type_name?: string | null } | undefined)?.type_name ?? null,
+      totonoiCode: (saunaProfileMap.get(u.id) as { totonoi_code?: string | null } | undefined)?.totonoi_code ?? null,
+      recordCount: recordCountMap.get(u.id) ?? 0,
+    }))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+}
+
 export async function adminGetPrefectures(): Promise<string[]> {
   await requireAdminAuth()
   const supabase = createAdminClient()
