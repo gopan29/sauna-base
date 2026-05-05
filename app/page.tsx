@@ -8,19 +8,37 @@ import { SaunaRecordCard } from '@/components/SaunaRecordCard'
 import { ScoreTrendChart } from '@/components/ScoreTrendChart'
 import { AIRecommendCard } from '@/components/AIRecommendCard'
 import { SaunaProfileCard } from '@/components/SaunaProfileCard'
-import { getMonthRecords, getUserAndProfile } from '@/lib/actions'
-import {
-  mockMonthlyStats,
-  mockScoreTrend,
-  mockCalendarDays,
-  mockAIAnalysis,
-  mockProfile,
-} from '@/lib/mock-data'
+import { getMonthRecords, getUserAndProfile, getAllRecordsRaw, getSaunaProfileData } from '@/lib/actions'
+import { mockScoreTrend, mockCalendarDays, mockAIAnalysis, mockProfile } from '@/lib/mock-data'
 import { analyzeRecords } from '@/lib/ai-analysis'
-import type { SaunaRecord, CalendarDay } from '@/types'
+import type { SaunaRecord, SaunaProfile, CalendarDay } from '@/types'
 import type { Database } from '@/types/database'
 
 type DbRecord = Database['public']['Tables']['sauna_records']['Row']
+
+const DAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
+
+function mode<T>(arr: T[]): T | null {
+  if (!arr.length) return null
+  const freq = new Map<T, number>()
+  for (const v of arr) freq.set(v, (freq.get(v) ?? 0) + 1)
+  return [...freq.entries()].sort((a, b) => b[1] - a[1])[0][0]
+}
+
+function calcStreak(records: SaunaRecord[]): number {
+  if (!records.length) return 0
+  const dateSet = new Set(records.map(r => r.date))
+  let streak = 0
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  while (true) {
+    const s = d.toISOString().split('T')[0]
+    if (!dateSet.has(s)) break
+    streak++
+    d.setDate(d.getDate() - 1)
+  }
+  return streak
+}
 
 function dbToRecord(r: DbRecord): SaunaRecord {
   return {
@@ -44,51 +62,75 @@ export default async function DashboardPage() {
   const now = new Date()
   const year = now.getFullYear()
   const month = now.getMonth() + 1
+  const prevYear = month === 1 ? year - 1 : year
+  const prevMonth = month === 1 ? 12 : month - 1
 
-  const [dbRecords, { profile: profileData, displayName: fetchedDisplayName }] = await Promise.all([
-    getMonthRecords(year, month),
+  const [allDbRecords, prevMonthDbRecords, { profile: profileData, displayName: fetchedDisplayName }, saunaProfileRaw] = await Promise.all([
+    getAllRecordsRaw(),
+    getMonthRecords(prevYear, prevMonth),
     getUserAndProfile(),
+    getSaunaProfileData(),
   ])
+
   const profile = profileData as { display_name: string | null } | null
   const isGuest = !profile
 
-  const records = dbRecords.map(dbToRecord)
+  const allRecords = allDbRecords.map(dbToRecord)
+  const hasAllData = allRecords.length > 0
+
+  const curMonthPrefix = `${year}-${String(month).padStart(2, '0')}`
+  const records = allRecords.filter(r => r.date.startsWith(curMonthPrefix))
   const hasData = records.length > 0
 
-  const visitCount = hasData ? records.length : mockMonthlyStats.visitCount
+  // Prev month stats
+  const prevVisitCount = prevMonthDbRecords.length
+  const prevTotalMinutes = prevMonthDbRecords.reduce((s, r) => s + (r.total_minutes ?? 0), 0)
+  const prevAvgScore = prevMonthDbRecords.length
+    ? prevMonthDbRecords.reduce((s, r) => s + r.score, 0) / prevMonthDbRecords.length
+    : null
+  const prevAvgSets = prevMonthDbRecords.length
+    ? prevMonthDbRecords.reduce((s, r) => s + r.sets, 0) / prevMonthDbRecords.length
+    : null
+  const prevAvgSaunaTemp = prevMonthDbRecords.length
+    ? Math.round(prevMonthDbRecords.reduce((s, r) => s + r.sauna_temp, 0) / prevMonthDbRecords.length)
+    : null
+  const prevAvgWaterTemp = prevMonthDbRecords.length
+    ? +(prevMonthDbRecords.reduce((s, r) => s + r.water_temp, 0) / prevMonthDbRecords.length).toFixed(1)
+    : null
+  const prevConditionScore = prevMonthDbRecords.length
+    ? Math.round(prevMonthDbRecords.filter(r => r.score >= 40).length / prevMonthDbRecords.length * 100)
+    : null
+
+  // Current month stats
+  const visitCount = hasData ? records.length : isGuest ? 12 : 0
   const avgScore = hasData
     ? Math.round(records.reduce((s, r) => s + r.score, 0) / records.length)
-    : mockMonthlyStats.avgScore
-  const bestScore = hasData
-    ? Math.max(...records.map(r => r.score))
-    : mockMonthlyStats.bestScore
+    : isGuest ? 34 : 0
+  const bestScore = hasData ? Math.max(...records.map(r => r.score)) : isGuest ? 46 : 0
   const avgSets = hasData
     ? +(records.reduce((s, r) => s + r.sets, 0) / records.length).toFixed(1)
-    : mockMonthlyStats.avgSets
+    : isGuest ? 3.1 : 0
   const avgSaunaTemp = hasData
     ? Math.round(records.reduce((s, r) => s + r.saunaTemp, 0) / records.length)
-    : mockMonthlyStats.avgSaunaTemp
+    : isGuest ? 95 : 0
   const avgWaterTemp = hasData
     ? +(records.reduce((s, r) => s + r.waterTemp, 0) / records.length).toFixed(1)
-    : mockMonthlyStats.avgWaterTemp
+    : isGuest ? 15.3 : 0
   const totalMinutes = hasData
     ? records.reduce((s, r) => s + (r.totalMinutes ?? 0), 0)
-    : mockMonthlyStats.totalMinutes
+    : isGuest ? 1104 : 0
+  const streakDays = hasAllData ? calcStreak(allRecords) : isGuest ? 5 : 0
 
-  const stats = {
-    visitCount,
-    avgScore,
-    bestScore,
-    avgSets,
-    avgSaunaTemp,
-    avgWaterTemp,
-    totalMinutes,
-    avgRestMinutes: mockMonthlyStats.avgRestMinutes,
-    streakDays: mockMonthlyStats.streakDays,
-    prevMonthVisitCount: mockMonthlyStats.prevMonthVisitCount,
-    prevMonthTotalMinutes: mockMonthlyStats.prevMonthTotalMinutes,
-    prevMonthAvgScore: mockMonthlyStats.prevMonthAvgScore,
-  }
+  // Diffs vs prev month
+  const visitDiff = isGuest ? 3 : prevVisitCount ? visitCount - prevVisitCount : 0
+  const minutesDiff = isGuest ? 255 : prevTotalMinutes ? totalMinutes - prevTotalMinutes : 0
+  const scoreDiff = isGuest ? 4.1 : prevAvgScore !== null ? +(avgScore - prevAvgScore).toFixed(1) : 0
+  const setsDiff = isGuest ? 0.6 : prevAvgSets !== null ? +(avgSets - prevAvgSets).toFixed(1) : null
+  const saunaTempDiff = isGuest ? 1 : prevAvgSaunaTemp !== null ? avgSaunaTemp - prevAvgSaunaTemp : null
+  const waterTempDiff = isGuest ? -0.4 : prevAvgWaterTemp !== null ? +(avgWaterTemp - prevAvgWaterTemp).toFixed(1) : null
+
+  const totalH = Math.floor(totalMinutes / 60)
+  const totalM = totalMinutes % 60
 
   const calendarDays: CalendarDay[] = hasData
     ? Array.from({ length: new Date(year, month, 0).getDate() }, (_, i) => {
@@ -104,39 +146,70 @@ export default async function DashboardPage() {
       })
     : mockCalendarDays
 
-  const scoreTrend = hasData
-    ? records.slice(-14).map(r => ({ date: r.date, score: r.score }))
+  const scoreTrend = hasAllData
+    ? allRecords.slice(0, 14).reverse().map(r => ({ date: r.date, score: r.score }))
     : mockScoreTrend
 
-  const aiAnalysis = hasData ? analyzeRecords(records) : mockAIAnalysis
+  const aiAnalysis = hasAllData ? analyzeRecords(allRecords) : mockAIAnalysis
+
+  // Condition panel (all records)
+  const highScoreAll = allRecords.filter(r => r.score >= 40)
+  const conditionScoreVal = hasAllData
+    ? Math.round(highScoreAll.length / allRecords.length * 100)
+    : isGuest ? 78 : 0
+  const conditionDiff = hasAllData && prevConditionScore !== null
+    ? conditionScoreVal - prevConditionScore
+    : isGuest ? 8 : null
+
+  const bestDayOfWeek = mode(highScoreAll.map(r => new Date(r.date).getDay()))
+  const bestDays = bestDayOfWeek !== null
+    ? [DAY_LABELS[bestDayOfWeek], DAY_LABELS[(bestDayOfWeek + 2) % 7]]
+    : isGuest ? ['金', '土'] : ['土', '日']
+
+  const allAvgSaunaTemp = hasAllData
+    ? allRecords.reduce((s, r) => s + r.saunaTemp, 0) / allRecords.length
+    : null
+  const allAvgWaterTemp = hasAllData
+    ? allRecords.reduce((s, r) => s + r.waterTemp, 0) / allRecords.length
+    : null
+
+  const condBestSaunaTemp = highScoreAll.length
+    ? `${Math.round(highScoreAll.reduce((a, r) => a + r.saunaTemp, 0) / highScoreAll.length)}℃前後`
+    : allAvgSaunaTemp ? `${Math.round(allAvgSaunaTemp)}℃前後` : '95℃前後'
+  const condBestWaterTemp = highScoreAll.length
+    ? `${Math.round(highScoreAll.reduce((a, r) => a + r.waterTemp, 0) / highScoreAll.length * 10) / 10}℃前後`
+    : allAvgWaterTemp ? `${Math.round(allAvgWaterTemp * 10) / 10}℃前後` : '15℃前後'
+  const outdoorCountHigh = highScoreAll.filter(r => r.restStyle === 'outdoor').length
+  const condBestRest = !highScoreAll.length || outdoorCountHigh >= highScoreAll.length * 0.5
+    ? '外気浴あり' : '内気浴'
+  const bestConditions = hasAllData
+    ? [condBestSaunaTemp, condBestWaterTemp, condBestRest]
+    : ['95℃前後', '15℃前後', '外気浴あり']
+
+  // SaunaProfile for card
+  const sp = saunaProfileRaw as {
+    preferred_sauna_temp?: string | null
+    preferred_water_temp?: string | null
+    outdoor_preference?: number
+    crowd_tolerance?: number
+    visit_frequency?: string | null
+  } | null
+  const realSaunaProfile: SaunaProfile = {
+    preferredSaunaTemp: sp?.preferred_sauna_temp
+      ?? (allAvgSaunaTemp ? `${Math.round(allAvgSaunaTemp)}℃前後` : '未設定'),
+    preferredWaterTemp: sp?.preferred_water_temp
+      ?? (allAvgWaterTemp ? `${Math.round(allAvgWaterTemp * 10) / 10}℃前後` : '未設定'),
+    outdoorPreference: sp?.outdoor_preference ?? 3,
+    crowdTolerance: sp?.crowd_tolerance ?? 3,
+    visitFrequency: sp?.visit_frequency ?? '未設定',
+  }
+  const displaySaunaProfile: SaunaProfile = isGuest ? mockProfile : realSaunaProfile
 
   const displayName = fetchedDisplayName ?? 'ゲスト'
-  const latestScore = hasData ? records[0]?.score ?? 0 : 42
-  const visitDiff = stats.prevMonthVisitCount
-    ? stats.visitCount - stats.prevMonthVisitCount
-    : 0
-  const minutesDiff = stats.prevMonthTotalMinutes
-    ? stats.totalMinutes - stats.prevMonthTotalMinutes
-    : 0
-  const scoreDiff = stats.prevMonthAvgScore
-    ? +(stats.avgScore - stats.prevMonthAvgScore).toFixed(1)
-    : 0
-
-  const totalH = Math.floor(stats.totalMinutes / 60)
-  const totalM = stats.totalMinutes % 60
+  const latestScore = hasData ? (records[0]?.score ?? 0) : isGuest ? 42 : 0
 
   return (
     <div className="p-4 lg:p-6">
-
-      {/* 管理画面ショートカット */}
-      <div className="flex justify-end mb-3">
-        <Link href="/admin"
-          className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs text-white/45 hover:text-white/70 transition-colors"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <Shield className="w-3.5 h-3.5" />
-          <span>管理画面</span>
-        </Link>
-      </div>
 
       {/* ゲストバナー */}
       {isGuest && (
@@ -205,16 +278,38 @@ export default async function DashboardPage() {
                 />
                 <div className="flex-1 space-y-1.5">
                   {[
-                    { label: 'セット数（今月）', value: `${stats.avgSets.toFixed(1)}セット`, diff: '先月比 +0.6↑', pos: true },
-                    { label: 'サウナ温度', value: `${stats.avgSaunaTemp}℃`, diff: '先月比 +1.3℃↑', pos: true },
-                    { label: '水風呂温度', value: `${stats.avgWaterTemp}℃`, diff: '先月比 -0.4℃↓', pos: false },
-                    { label: '平均休憩時間', value: `${stats.avgRestMinutes}分`, diff: '先月比 +1.2分↑', pos: true },
+                    {
+                      label: 'セット数（今月）',
+                      value: `${avgSets.toFixed(1)}セット`,
+                      diff: setsDiff !== null ? `先月比 ${setsDiff >= 0 ? '+' : ''}${setsDiff}↑` : null,
+                      pos: setsDiff !== null ? setsDiff >= 0 : true,
+                    },
+                    {
+                      label: 'サウナ温度',
+                      value: `${avgSaunaTemp}℃`,
+                      diff: saunaTempDiff !== null ? `先月比 ${saunaTempDiff >= 0 ? '+' : ''}${saunaTempDiff}℃↑` : null,
+                      pos: saunaTempDiff !== null ? saunaTempDiff >= 0 : true,
+                    },
+                    {
+                      label: '水風呂温度',
+                      value: `${avgWaterTemp}℃`,
+                      diff: waterTempDiff !== null ? `先月比 ${waterTempDiff >= 0 ? '+' : ''}${waterTempDiff}℃↑` : null,
+                      pos: waterTempDiff !== null ? waterTempDiff <= 0 : true,
+                    },
+                    {
+                      label: '訪問回数（今月）',
+                      value: `${visitCount}回`,
+                      diff: prevVisitCount || isGuest ? `先月比 ${visitDiff >= 0 ? '+' : ''}${visitDiff}↑` : null,
+                      pos: visitDiff >= 0,
+                    },
                   ].map(item => (
                     <div key={item.label} className="flex justify-between items-center text-xs">
                       <span className="text-white/40">{item.label}</span>
                       <div className="text-right">
                         <span className="text-white/75 font-medium">{item.value}</span>
-                        <span className={`ml-1.5 text-[10px] ${item.pos ? 'text-[#a5d63a]' : 'text-red-400'}`}>{item.diff}</span>
+                        {item.diff && (
+                          <span className={`ml-1.5 text-[10px] ${item.pos ? 'text-[#a5d63a]' : 'text-red-400'}`}>{item.diff}</span>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -227,9 +322,9 @@ export default async function DashboardPage() {
               <StatCard
                 icon={<BarChart2 className="w-3.5 h-3.5" />}
                 label="サウナ回数（今月）"
-                value={stats.visitCount}
+                value={visitCount}
                 unit="回"
-                diff={`先月比 +${visitDiff}↑`}
+                diff={`先月比 ${visitDiff >= 0 ? '+' : ''}${visitDiff}↑`}
                 diffPositive={visitDiff >= 0}
               />
               <StatCard
@@ -237,23 +332,23 @@ export default async function DashboardPage() {
                 label="総滞在時間（今月）"
                 value={`${totalH}h`}
                 unit={`${totalM}m`}
-                diff={`先月比 +${Math.floor(minutesDiff/60)}h${minutesDiff%60}m↑`}
+                diff={`先月比 ${minutesDiff >= 0 ? '+' : ''}${Math.floor(Math.abs(minutesDiff)/60)}h${Math.abs(minutesDiff)%60}m${minutesDiff >= 0 ? '↑' : '↓'}`}
                 diffPositive={minutesDiff >= 0}
               />
               <StatCard
                 icon={<Flame className="w-3.5 h-3.5" />}
                 label="連続記録日数"
-                value={stats.streakDays}
+                value={streakDays}
                 unit="日"
-                diff="自己ベスト更新中！"
-                diffPositive
+                diff={streakDays > 0 ? '継続中！' : '記録してスタート'}
+                diffPositive={streakDays > 0}
               />
               <StatCard
                 icon={<TrendingUp className="w-3.5 h-3.5" />}
                 label="平均スコア（今月）"
-                value={stats.avgScore}
+                value={avgScore}
                 unit="点"
-                diff={`先月比 +${scoreDiff}↑`}
+                diff={`先月比 ${scoreDiff >= 0 ? '+' : ''}${scoreDiff}↑`}
                 diffPositive={scoreDiff >= 0}
               />
             </div>
@@ -267,17 +362,16 @@ export default async function DashboardPage() {
 
           {/* Row 3: 今月の統計 + スコア推移 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* 今月の統計 */}
             <GlassCard className="p-4">
               <h3 className="text-sm font-semibold text-white/80 mb-3">今月の統計</h3>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { label: '平均スコア', value: `${stats.avgScore}点`, diff: `先月比 +${scoreDiff}↑`, pos: true },
-                  { label: 'ベストスコア', value: `${stats.bestScore}点`, diff: '更新日 5/12' },
-                  { label: '平均セット数', value: `${stats.avgSets.toFixed(1)}セット`, diff: '先月比 +0.6↑', pos: true },
-                  { label: '平均サウナ温度', value: `${stats.avgSaunaTemp}℃`, diff: '先月比 +1.3℃↑', pos: true },
-                  { label: '平均水風呂温度', value: `${stats.avgWaterTemp}℃`, diff: '先月比 -0.4℃↓', pos: false },
-                  { label: '平均休憩時間', value: `${stats.avgRestMinutes}分`, diff: '先月比 +1.2分↑', pos: true },
+                  { label: '訪問回数', value: `${visitCount}回`, diff: prevVisitCount || isGuest ? `先月比 ${visitDiff >= 0 ? '+' : ''}${visitDiff}↑` : null, pos: visitDiff >= 0 },
+                  { label: '平均スコア', value: `${avgScore}点`, diff: `先月比 ${scoreDiff >= 0 ? '+' : ''}${scoreDiff}↑`, pos: scoreDiff >= 0 },
+                  { label: 'ベストスコア', value: `${bestScore}点`, diff: null },
+                  { label: '平均セット数', value: `${avgSets.toFixed(1)}セット`, diff: setsDiff !== null ? `先月比 ${setsDiff >= 0 ? '+' : ''}${setsDiff}↑` : null, pos: setsDiff !== null ? setsDiff >= 0 : true },
+                  { label: '平均サウナ温度', value: `${avgSaunaTemp}℃`, diff: saunaTempDiff !== null ? `先月比 ${saunaTempDiff >= 0 ? '+' : ''}${saunaTempDiff}℃↑` : null, pos: saunaTempDiff !== null ? saunaTempDiff >= 0 : true },
+                  { label: '平均水風呂温度', value: `${avgWaterTemp}℃`, diff: waterTempDiff !== null ? `先月比 ${waterTempDiff >= 0 ? '+' : ''}${waterTempDiff}℃↑` : null, pos: waterTempDiff !== null ? waterTempDiff <= 0 : true },
                 ].map(item => (
                   <div key={item.label} className="glass rounded-xl p-2 text-center">
                     <p className="text-[9px] text-white/40 mb-0.5">{item.label}</p>
@@ -314,26 +408,26 @@ export default async function DashboardPage() {
                       <circle cx="50" cy="50" r="40" fill="none" stroke="#7cb342" strokeWidth="10"
                         strokeLinecap="round"
                         strokeDasharray={`${2 * Math.PI * 40}`}
-                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - 0.78)}`}
+                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - conditionScoreVal / 100)}`}
                         style={{ filter: 'drop-shadow(0 0 4px rgba(124,179,66,0.5))' }}
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xl font-bold text-[#a5d63a]">78%</span>
+                      <span className="text-xl font-bold text-[#a5d63a]">{conditionScoreVal}%</span>
                     </div>
                   </div>
                 </div>
-                <p className="text-[10px] text-[#a5d63a] text-center">先月比 +8%↑</p>
+                {conditionDiff !== null && (
+                  <p className={`text-[10px] text-center ${conditionDiff >= 0 ? 'text-[#a5d63a]' : 'text-red-400'}`}>
+                    先月比 {conditionDiff >= 0 ? '+' : ''}{conditionDiff}%{conditionDiff >= 0 ? '↑' : '↓'}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <div>
-                  <p className="text-[9px] text-white/40">ベストコンディション時間帯</p>
-                  <p className="text-xs font-medium text-white/75">15:00 - 18:00</p>
-                </div>
-                <div>
                   <p className="text-[9px] text-white/40">ととのいやすい曜日</p>
                   <div className="flex gap-1 mt-0.5">
-                    {['金', '土', '日'].map(d => (
+                    {bestDays.map(d => (
                       <span key={d} className="text-[10px] px-1.5 py-0.5 rounded-md text-[#a5d63a]"
                         style={{ background: 'rgba(124,179,66,0.15)', border: '1px solid rgba(124,179,66,0.3)' }}>
                         {d}
@@ -344,7 +438,7 @@ export default async function DashboardPage() {
                 <div>
                   <p className="text-[9px] text-white/40">ベストなサウナ条件</p>
                   <div className="flex flex-wrap gap-1 mt-0.5">
-                    {['95℃前後', '15℃前後', '外気浴あり'].map(c => (
+                    {bestConditions.map(c => (
                       <span key={c} className="text-[9px] px-1.5 py-0.5 rounded-md text-white/50"
                         style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
                         {c}
@@ -352,19 +446,23 @@ export default async function DashboardPage() {
                     ))}
                   </div>
                 </div>
+                <div>
+                  <p className="text-[9px] text-white/40">分析対象の記録数</p>
+                  <p className="text-xs text-white/60 mt-0.5">{allRecords.length}件 / 高スコア {highScoreAll.length}件</p>
+                </div>
               </div>
             </div>
           </GlassCard>
 
           <AIRecommendCard analysis={aiAnalysis} />
-          <SaunaProfileCard profile={mockProfile} />
+          <SaunaProfileCard profile={displaySaunaProfile} />
         </div>
       </div>
 
       {/* スマホ用 右パネルコンテンツ */}
       <div className="lg:hidden mt-4 space-y-4">
         <AIRecommendCard analysis={aiAnalysis} />
-        <SaunaProfileCard profile={mockProfile} />
+        <SaunaProfileCard profile={displaySaunaProfile} />
       </div>
     </div>
   )
