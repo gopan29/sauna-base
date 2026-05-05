@@ -234,14 +234,13 @@ export default async function DashboardPage() {
 
       {/* ヘッダー */}
       <div className="flex items-start justify-between mb-5">
-        <div>
-          <h1 className="text-xl font-bold text-white/90">
-            {isGuest ? 'SAUNA BASE へようこそ' : `おはようございます、${displayName}さん`}
-          </h1>
-          <p className="text-sm text-white/45 mt-0.5">
-            {isGuest ? 'サウナ体験をデータで進化させよう。' : '今日も最高のととのいを記録しましょう。'}
-          </p>
-        </div>
+        {isGuest && (
+          <div>
+            <h1 className="text-xl font-bold text-white/90">SAUNA BASE へようこそ</h1>
+            <p className="text-sm text-white/45 mt-0.5">サウナ体験をデータで進化させよう。</p>
+          </div>
+        )}
+        {!isGuest && <div />}
         <div className="flex items-center gap-3 shrink-0">
           <div className="hidden sm:flex items-center gap-1.5 glass rounded-xl px-3 py-1.5 text-xs text-white/60">
             <Cloud className="w-3.5 h-3.5" />
