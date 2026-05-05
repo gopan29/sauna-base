@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Leaf, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase-browser'
+import { saveProfileType } from '@/lib/actions'
 
 type Tab = 'login' | 'signup'
 type MessageType = 'success' | 'error'
@@ -34,6 +35,14 @@ export default function LoginPage() {
       setMessage('メールアドレスまたはパスワードが正しくありません。')
       setMessageType('error')
     } else {
+      const pending = localStorage.getItem('pending_totonoi')
+      if (pending) {
+        try {
+          const { typeName, code } = JSON.parse(pending)
+          await saveProfileType(typeName, code)
+          localStorage.removeItem('pending_totonoi')
+        } catch {}
+      }
       router.push('/')
       router.refresh()
     }
@@ -63,7 +72,19 @@ export default function LoginPage() {
       setMessage(error.message)
       setMessageType('error')
     } else if (data.session) {
-      router.push('/onboarding')
+      const pending = localStorage.getItem('pending_totonoi')
+      if (pending) {
+        try {
+          const { typeName, code } = JSON.parse(pending)
+          await saveProfileType(typeName, code)
+          localStorage.removeItem('pending_totonoi')
+          router.push('/')
+        } catch {
+          router.push('/onboarding')
+        }
+      } else {
+        router.push('/onboarding')
+      }
     } else {
       setMessage('確認メールを送信しました。メールをご確認の上、ログインしてください。')
       setMessageType('success')

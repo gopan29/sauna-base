@@ -1,8 +1,72 @@
 import { SaunaProfileCard } from '@/components/SaunaProfileCard'
 import { GlassCard } from '@/components/GlassCard'
-import { mockProfile } from '@/lib/mock-data'
+import { getSaunaProfileData, getAllRecordsRaw } from '@/lib/actions'
+import { adjustmentMessages } from '@/lib/sauna-base/scoreAdjustments'
+import type { SaunaProfile } from '@/types'
 
-export default function ProfilePage() {
+function tempToRadar(avgTemp: number | null): number {
+  if (!avgTemp) return 3
+  if (avgTemp >= 100) return 5
+  if (avgTemp >= 95) return 4
+  if (avgTemp >= 88) return 3
+  if (avgTemp >= 80) return 2
+  return 1
+}
+
+function waterTempToRadar(avgTemp: number | null): number {
+  if (!avgTemp) return 3
+  if (avgTemp <= 14) return 5
+  if (avgTemp <= 16) return 4
+  if (avgTemp <= 18) return 3
+  if (avgTemp <= 20) return 2
+  return 1
+}
+
+function freqToRadar(freq: string | null): number {
+  if (!freq) return 2
+  if (freq.includes('4回') || freq.includes('毎日')) return 5
+  if (freq.includes('2〜3') || freq.includes('2-3')) return 4
+  if (freq.includes('1〜2') || freq.includes('1-2')) return 3
+  if (freq.includes('週1')) return 2
+  return 1
+}
+
+export default async function ProfilePage() {
+  const [saunaProfile, records] = await Promise.all([
+    getSaunaProfileData(),
+    getAllRecordsRaw(),
+  ])
+
+  const hasRecords = records.length > 0
+  const avgSaunaTemp = hasRecords
+    ? records.reduce((a, r) => a + r.sauna_temp, 0) / records.length
+    : null
+  const avgWaterTemp = hasRecords
+    ? records.reduce((a, r) => a + r.water_temp, 0) / records.length
+    : null
+
+  const profile: SaunaProfile = {
+    preferredSaunaTemp: saunaProfile?.preferred_sauna_temp
+      ?? (avgSaunaTemp ? `${Math.round(avgSaunaTemp)}℃前後` : '未設定'),
+    preferredWaterTemp: saunaProfile?.preferred_water_temp
+      ?? (avgWaterTemp ? `${Math.round(avgWaterTemp)}℃前後` : '未設定'),
+    outdoorPreference: saunaProfile?.outdoor_preference ?? 3,
+    crowdTolerance: saunaProfile?.crowd_tolerance ?? 3,
+    visitFrequency: saunaProfile?.visit_frequency ?? '未設定',
+  }
+
+  const radarValues = [
+    tempToRadar(avgSaunaTemp),
+    waterTempToRadar(avgWaterTemp),
+    profile.outdoorPreference,
+    profile.crowdTolerance,
+    freqToRadar(profile.visitFrequency),
+  ]
+
+  const typeName = (saunaProfile as { type_name?: string | null } | null)?.type_name ?? null
+  const totonoiCode = (saunaProfile as { totonoi_code?: string | null } | null)?.totonoi_code ?? null
+  const adjustmentMsg = typeName ? adjustmentMessages[typeName] ?? null : null
+
   return (
     <div className="p-4 lg:p-6 max-w-lg">
       <div className="mb-5">
@@ -10,16 +74,44 @@ export default function ProfilePage() {
         <p className="text-sm text-white/45 mt-0.5">あなたの好みを登録するとAI分析の精度が上がります。</p>
       </div>
 
-      {/* 誘導メッセージ */}
-      <GlassCard className="p-3 mb-4"
-        style={{ background: 'rgba(124,179,66,0.07)', border: '1px solid rgba(124,179,66,0.2)' }}>
-        <p className="text-xs text-[#a5d63a]/80 leading-relaxed">
-          💡 サウナプロファイルを入力すると、あなたに合ったサウナ提案・ととのい分析の精度が上がります。
-          入力は任意です。記録データからも自動生成されます。
-        </p>
-      </GlassCard>
+      {/* TOTONOI CODE カード */}
+      {totonoiCode && typeName ? (
+        <div
+          className="rounded-2xl p-4 mb-4"
+          style={{
+            background: 'rgba(165,214,58,0.07)',
+            border: '1px solid rgba(165,214,58,0.25)',
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="text-[10px] text-[#a5d63a]/70 tracking-widest uppercase mb-0.5">TOTONOI CODE</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold text-[#a5d63a] tracking-wider">{totonoiCode}</span>
+                <span className="text-xs font-semibold text-white/60">{typeName}</span>
+              </div>
+            </div>
+          </div>
+          {adjustmentMsg && (
+            <p className="text-[10px] text-white/40 mt-2 leading-relaxed">{adjustmentMsg}</p>
+          )}
+        </div>
+      ) : (
+        <GlassCard className="p-3 mb-4"
+          style={{ background: 'rgba(124,179,66,0.07)', border: '1px solid rgba(124,179,66,0.2)' }}>
+          <p className="text-xs text-[#a5d63a]/70 leading-relaxed">
+            診断タブから「サウナー診断」を受けると、あなただけの TOTONOI CODE が発行されます。
+          </p>
+        </GlassCard>
+      )}
 
-      <SaunaProfileCard profile={mockProfile} />
+      <SaunaProfileCard profile={profile} radarValues={radarValues} />
+
+      {hasRecords && (
+        <p className="text-[10px] text-white/25 mt-3 text-center">
+          {records.length}件の記録データから自動生成しています
+        </p>
+      )}
     </div>
   )
 }

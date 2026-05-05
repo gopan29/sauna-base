@@ -36,7 +36,16 @@ export default function OnboardingPage() {
   }, [questionIndex, scores])
 
   const handleLoadingDone = () => {
-    if (profile) saveProfileType(profile.typeName, profile.code)
+    if (profile) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('pending_totonoi', JSON.stringify({ typeName: profile.typeName, code: profile.code }))
+      }
+      saveProfileType(profile.typeName, profile.code).then(res => {
+        if (res && 'success' in res) {
+          localStorage.removeItem('pending_totonoi')
+        }
+      })
+    }
     setStep('result')
   }
   const handleResultContinue = () => setStep('profile')

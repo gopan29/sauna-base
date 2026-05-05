@@ -11,34 +11,51 @@ import type { SaunaProfile } from '@/types'
 
 interface Props {
   profile: SaunaProfile
+  radarValues?: number[]
 }
 
-const radarData = [
-  { subject: 'サウナ温度', value: 4.5 },
-  { subject: '水風呂温度', value: 4.8 },
-  { subject: '外気浴', value: 5 },
-  { subject: '混雑耐性', value: 2 },
-  { subject: 'サウナ頻度', value: 4 },
-]
+function outdoorLabel(v: number) {
+  if (v >= 5) return '外気浴が大好き'
+  if (v >= 4) return '外気浴が好き'
+  if (v >= 3) return 'どちらでも'
+  if (v >= 2) return 'やや苦手'
+  return '特にこだわらない'
+}
 
-const profileItems: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }[] = [
-  { icon: Thermometer,  label: '好きなサウナ温度', value: '90〜100℃' },
-  { icon: Droplets,     label: '好きな水風呂温度', value: '14〜17℃' },
-  { icon: Leaf,         label: '外気浴の好み',     value: '外気浴が好き' },
-  { icon: Users,        label: '混雑耐性',         value: 'やや平気' },
-  { icon: CalendarDays, label: 'サウナ頻度',       value: '週2〜3回' },
-]
+function crowdLabel(v: number) {
+  if (v >= 5) return '気にしない'
+  if (v >= 4) return 'やや平気'
+  if (v >= 3) return 'どちらでも'
+  if (v >= 2) return 'やや気になる'
+  return '空いている時が好き'
+}
 
-export function SaunaProfileCard({ profile }: Props) {
+export function SaunaProfileCard({ profile, radarValues }: Props) {
+  const rv = radarValues ?? [3.5, 3.5, profile.outdoorPreference, profile.crowdTolerance, 3]
+
+  const radarData = [
+    { subject: 'サウナ温度', value: rv[0] },
+    { subject: '水風呂温度', value: rv[1] },
+    { subject: '外気浴',     value: rv[2] },
+    { subject: '混雑耐性',   value: rv[3] },
+    { subject: 'サウナ頻度', value: rv[4] },
+  ]
+
+  const profileItems = [
+    { icon: Thermometer,   label: '好きなサウナ温度', value: profile.preferredSaunaTemp || '未設定' },
+    { icon: Droplets,      label: '好きな水風呂温度', value: profile.preferredWaterTemp || '未設定' },
+    { icon: Leaf,          label: '外気浴の好み',     value: outdoorLabel(profile.outdoorPreference) },
+    { icon: Users,         label: '混雑耐性',         value: crowdLabel(profile.crowdTolerance) },
+    { icon: CalendarDays,  label: 'サウナ頻度',       value: profile.visitFrequency || '未設定' },
+  ]
+
   return (
     <GlassCard className="p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-white/80">あなたのサウナプロファイル</h3>
-        <button className="text-[10px] text-[#7cb342] hover:text-[#a5d63a]">編集する &rsaquo;</button>
       </div>
       <p className="text-[9px] text-white/35 mb-3">プロフィールは記録データから自動生成されています</p>
 
-      {/* レーダーチャート */}
       <div className="h-36 mb-2">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={radarData}>
@@ -59,7 +76,6 @@ export function SaunaProfileCard({ profile }: Props) {
         </ResponsiveContainer>
       </div>
 
-      {/* 詳細リスト */}
       <div className="space-y-1.5">
         {profileItems.map(item => (
           <div key={item.label} className="flex items-center justify-between text-xs">
