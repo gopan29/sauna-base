@@ -35,7 +35,7 @@ export function DiagnosisStart({ onStart }: { onStart: () => void }) {
         >
           <div className="text-center mb-6">
             <p className="text-xs tracking-widest uppercase mb-2 text-[#4d8a28] lg:text-[#a5d63a]/65">
-              Diagnosis
+              DIAGNOSIS
             </p>
             <h1 className="text-2xl font-bold mb-1 text-[#1a2a10] lg:text-white">サウナー診断</h1>
             <p className="text-sm text-[#1a2a10]/60 lg:text-white/50">
@@ -46,9 +46,9 @@ export function DiagnosisStart({ onStart }: { onStart: () => void }) {
           {/* 特徴3点 */}
           <div className="space-y-3 mb-7">
             {[
-              { icon: Flame,    text: '10問でわかるあなたの熱耐性と好み' },
+              { icon: Flame,    text: '14問でわかるあなたの熱耐性と好み' },
               { icon: Droplets, text: '水風呂・休憩スタイルを分析' },
-              { icon: Brain,    text: 'AIがととのいスコアに反映する初期設定を生成' },
+              { icon: Brain,    text: 'ととのいスコアに反映する初期設定を生成' },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-3">
                 <div
