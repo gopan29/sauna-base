@@ -58,6 +58,7 @@ export default function OnboardingPage() {
       )}
       {step === 'question' && (
         <DiagnosisQuestion
+          key={questionIndex}
           question={questions[questionIndex]}
           questionIndex={questionIndex}
           totalQuestions={questions.length}
