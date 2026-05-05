@@ -21,7 +21,7 @@ export default function OnboardingPage() {
 
   const handleStart = () => setStep('question')
 
-  const handleAnswer = useCallback((optionId: 'A' | 'B' | 'C') => {
+  const handleAnswer = useCallback((optionId: 'A' | 'B' | 'C' | 'D') => {
     const option = questions[questionIndex].options.find(o => o.id === optionId)!
     const newScores = applyContribution(scores, option.contributions)
     setScores(newScores)

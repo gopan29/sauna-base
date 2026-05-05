@@ -1,49 +1,24 @@
 import type { Heat, Water, Mind, Style, TotonoiProfile } from '@/types/sauna-base'
 
-const heatLabel: Record<Heat, string> = {
+export const heatLabel: Record<Heat, string> = {
   B: 'Balanced（バランス）',
   H: 'Hot（高温志向）',
   E: 'Extreme（激熱志向）',
 }
-const waterLabel: Record<Water, string> = {
+export const waterLabel: Record<Water, string> = {
   S: 'Soft（マイルド）',
   C: 'Cool（標準冷水）',
   I: 'Ice（極冷志向）',
 }
-const mindLabel: Record<Mind, string> = {
+export const mindLabel: Record<Mind, string> = {
   C: 'Calm（リラックス）',
   F: 'Focus（集中）',
   D: 'Deep（深ととのい）',
 }
-const styleLabel: Record<Style, string> = {
+export const styleLabel: Record<Style, string> = {
   F: 'Flow（感覚型）',
   R: 'Routine（安定型）',
   P: 'Push（ストイック型）',
-}
-
-const mindAdj: Record<Mind, string> = { C: 'Calm', F: 'Focused', D: 'Deep' }
-const heatNoun: Record<Heat, string> = { B: 'Balance', H: 'Heat', E: 'Extreme' }
-const styleNoun: Record<Style, string> = { F: 'Flow', R: 'Routine', P: 'Push' }
-
-const heatTempDesc: Record<Heat, string> = {
-  B: 'バランスの取れた温度帯（80〜90℃）のサウナ',
-  H: '高温サウナ（90〜100℃）',
-  E: '極限の高温（100℃以上）のサウナ',
-}
-const waterTempDesc: Record<Water, string> = {
-  S: 'ゆっくり入れるマイルドな水風呂（18℃以上）',
-  C: '標準的な冷たさの水風呂（14〜17℃）',
-  I: '極冷水の水風呂（シングル〜13℃台）',
-}
-const mindPhrase: Record<Mind, string> = {
-  C: '癒しとリラックスを大切にしながら',
-  F: '集中してサウナ・水風呂・休憩の流れを整えることで',
-  D: '深く没入し、意識が落ちる感覚を楽しむことで',
-}
-const stylePhrase: Record<Style, string> = {
-  F: 'その日の感覚に合わせて柔軟に',
-  R: '安定したルーティンで',
-  P: 'ストイックにセット数・時間を管理して',
 }
 
 const saunaTemp: Record<Heat, string> = {
@@ -63,18 +38,85 @@ const sets: Record<Style, string> = {
 }
 const restStyle: Record<Mind, string> = {
   C: 'リラックス重視',
-  F: '集中・呼吸重視',
+  F: '呼吸・体感重視',
   D: '深い外気浴・瞑想重視',
+}
+
+export function mapToType(code: string): string {
+  const [heat, water, mind, style] = code.split('')
+
+  if (heat === 'E' || water === 'I') {
+    if (mind === 'D' && style === 'P') return '極限ストイック整い型'
+    if (mind === 'D') return 'ディープストイック型'
+    if (mind === 'F' && style === 'P') return 'ハード整い型'
+    if (mind === 'F') return 'コントロール整い型'
+    return 'ストイック寄りエンジョイ型'
+  }
+
+  if (heat === 'H' || water === 'C') {
+    if (mind === 'F' && style === 'R') return '完成度重視バランス型'
+    if (mind === 'F') return '安定整い型'
+    return 'ベーシック整い型'
+  }
+
+  if (heat === 'B' && water === 'S') {
+    if (mind === 'C' && style === 'F') return '深リラックス型'
+    if (mind === 'C') return 'ゆる整い型'
+    return 'マイルド整い型'
+  }
+
+  if (mind === 'D') {
+    if (style === 'R') return '瞑想サウナー型'
+    return '没入整い型'
+  }
+
+  if (mind === 'C') {
+    if (style === 'F') return 'サウナ満喫型'
+    return '気分整い型'
+  }
+
+  return 'ベーシック整い型'
+}
+
+const typeDescriptions: Record<string, string> = {
+  '極限ストイック整い型':
+    '極限に近い熱と冷たさに反応しやすいタイプ。\n熱・冷・セット構成がハマるほど、ととのいスコアが伸びやすいです。',
+  'ディープストイック型':
+    '強い刺激だけでなく、休憩中の深い没入まで含めてととのいを作るタイプです。',
+  'ハード整い型':
+    'しっかり入ること、セット数をこなすこと、負荷の強さでスコアが伸びやすいタイプです。',
+  'コントロール整い型':
+    'サウナ・水風呂・休憩の流れを整えることで、安定して高いスコアを出しやすいタイプです。',
+  'ストイック寄りエンジョイ型':
+    '熱や水風呂の刺激も楽しみつつ、最終的な満足感も大切にするタイプです。',
+  '完成度重視バランス型':
+    '特定の要素だけでなく、全体の完成度でととのいを感じるタイプです。',
+  '安定整い型':
+    '無理のない温度・水風呂・休憩の流れで、安定したととのいを作るタイプです。',
+  'ベーシック整い型':
+    '基本的な気持ちよさを大切にし、無理なくサウナ体験を楽しむタイプです。',
+  '深リラックス型':
+    '刺激よりも、休憩の深さと満足感でととのうタイプです。',
+  'ゆる整い型':
+    '無理に追い込まず、その日の気持ちよさを優先してととのうタイプです。',
+  'マイルド整い型':
+    '熱さや冷たさの刺激よりも、心地よさ・安心感・余韻を重視するタイプです。',
+  '瞑想サウナー型':
+    '静けさ、呼吸、内面の落ち着きがスコアに反映されやすいタイプです。',
+  '没入整い型':
+    'サウナ中の没入感と、休憩中に深く落ちる感覚を重視するタイプです。',
+  'サウナ満喫型':
+    'サウナだけでなく、施設の雰囲気や体験全体の満足度を重視するタイプです。',
+  '気分整い型':
+    'その日の気分や体調に合っていたかどうかが、スコアに反映されやすいタイプです。',
 }
 
 export function buildProfile(
   heat: Heat, water: Water, mind: Mind, style: Style
 ): TotonoiProfile {
   const code = `${heat}${water}${mind}${style}`
-  const typeName = `${mindAdj[mind]} ${heatNoun[heat]} ${styleNoun[style]}`
-  const description =
-    `あなたは${heatTempDesc[heat]}と${waterTempDesc[water]}の組み合わせが合っているタイプです。` +
-    `${mindPhrase[mind]}、${stylePhrase[style]}ととのいを深めることができます。`
+  const typeName = mapToType(code)
+  const description = typeDescriptions[typeName] ?? ''
 
   return {
     code,
@@ -82,10 +124,8 @@ export function buildProfile(
     typeName,
     description,
     recommendedSaunaTemp: saunaTemp[heat],
-    recommendedWaterTemp:  waterTemp[water],
-    recommendedSets:       sets[style],
-    recommendedRestStyle:  restStyle[mind],
+    recommendedWaterTemp: waterTemp[water],
+    recommendedSets: sets[style],
+    recommendedRestStyle: restStyle[mind],
   }
 }
-
-export { heatLabel, waterLabel, mindLabel, styleLabel }

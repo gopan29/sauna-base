@@ -13,11 +13,11 @@ export function DiagnosisQuestion({
   question: Question
   questionIndex: number
   totalQuestions: number
-  onAnswer: (optionId: 'A' | 'B' | 'C') => void
+  onAnswer: (optionId: 'A' | 'B' | 'C' | 'D') => void
 }) {
-  const [selected, setSelected] = useState<'A' | 'B' | 'C' | null>(null)
+  const [selected, setSelected] = useState<'A' | 'B' | 'C' | 'D' | null>(null)
 
-  const handleSelect = (id: 'A' | 'B' | 'C') => {
+  const handleSelect = (id: 'A' | 'B' | 'C' | 'D') => {
     setSelected(id)
     setTimeout(() => {
       setSelected(null)
@@ -46,7 +46,7 @@ export function DiagnosisQuestion({
           }}
         >
           <p className="text-xs mb-3 tracking-widest text-[#4d8a28] lg:text-[#a5d63a]/65">
-            Q{questionIndex + 1}
+            Q{question.displayNumber}
           </p>
           <h2 className="text-lg font-bold leading-snug text-[#1a2a10] lg:text-white">
             {question.text}
@@ -60,7 +60,7 @@ export function DiagnosisQuestion({
             return (
               <button
                 key={opt.id}
-                onClick={() => handleSelect(opt.id)}
+                onClick={() => handleSelect(opt.id as 'A' | 'B' | 'C' | 'D')}
                 disabled={selected !== null}
                 className="w-full text-left rounded-2xl p-4 transition-all active:scale-[0.98] flex items-start gap-3.5"
                 style={{

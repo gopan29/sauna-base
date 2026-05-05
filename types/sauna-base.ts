@@ -32,13 +32,14 @@ export type ScoreContribution = {
 }
 
 export type AnswerOption = {
-  id: 'A' | 'B' | 'C'
+  id: 'A' | 'B' | 'C' | 'D'
   text: string
   contributions: ScoreContribution
 }
 
 export type Question = {
   id: number
+  displayNumber: number
   text: string
   options: AnswerOption[]
 }
