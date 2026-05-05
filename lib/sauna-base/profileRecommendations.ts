@@ -1,4 +1,5 @@
 import type { Heat, Water, Mind, Style, TotonoiProfile } from '@/types/sauna-base'
+import { getAnimalByTypeName } from './totonoiTypes'
 
 export const heatLabel: Record<Heat, string> = {
   B: 'Balanced（バランス）',
@@ -117,12 +118,18 @@ export function buildProfile(
   const code = `${heat}${water}${mind}${style}`
   const typeName = mapToType(code)
   const description = typeDescriptions[typeName] ?? ''
+  const animal = getAnimalByTypeName(typeName)
 
   return {
     code,
     heat, water, mind, style,
     typeName,
     description,
+    animalKey: animal.animalKey,
+    animalName: animal.animalName,
+    illustrationPath: animal.illustrationPath,
+    emoji: animal.emoji,
+    color: animal.color,
     recommendedSaunaTemp: saunaTemp[heat],
     recommendedWaterTemp: waterTemp[water],
     recommendedSets: sets[style],

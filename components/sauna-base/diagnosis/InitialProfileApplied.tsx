@@ -1,4 +1,5 @@
 import type { TotonoiProfile } from '@/types/sauna-base'
+import { TotonoiAnimalCard } from '@/components/sauna-base/totonoi/TotonoiAnimalCard'
 import { CheckCircle, Thermometer, Droplets, BarChart2, Wind } from 'lucide-react'
 
 export function InitialProfileApplied({
@@ -19,21 +20,25 @@ export function InitialProfileApplied({
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
 
-        {/* ヘッダー */}
+        {/* ヘッダー：動物アイコン */}
         <div className="text-center mb-6">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{
-              background: 'rgba(165,214,58,0.15)',
-              border: '1px solid rgba(165,214,58,0.35)',
-              boxShadow: '0 0 24px rgba(165,214,58,0.25)',
-            }}
-          >
-            <CheckCircle className="w-8 h-8" style={{ color: '#a5d63a' }} />
+          <div className="flex justify-center mb-4">
+            <TotonoiAnimalCard
+              illustrationPath={profile.illustrationPath}
+              animalName={profile.animalName}
+              animalKey={profile.animalKey}
+              emoji={profile.emoji}
+              color={profile.color}
+              size="md"
+              showName={false}
+            />
           </div>
           <h2 className="text-xl font-bold mb-1 text-[#1a2a10] lg:text-white">初期設定が反映されました</h2>
           <p className="text-xs text-[#1a2a10]/50 lg:text-white/45">
-            TOTONOI CODE <span className="font-bold" style={{ color: '#4d8a28' }}>{profile.code}</span> に基づいて設定しました
+            TOTONOI CODE <span className="font-bold" style={{ color: '#4d8a28' }}>{profile.code}</span>
+            <span className="ml-1.5 text-[#1a2a10]/40 lg:text-white/35">
+              {profile.typeName}
+            </span>
           </p>
         </div>
 

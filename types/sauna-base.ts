@@ -11,6 +11,11 @@ export type TotonoiProfile = {
   style: Style
   typeName: string
   description: string
+  animalKey: string
+  animalName: string
+  illustrationPath: string
+  emoji: string
+  color: string
   recommendedSaunaTemp: string
   recommendedWaterTemp: string
   recommendedSets: string

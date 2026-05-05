@@ -2,7 +2,10 @@ import { SaunaProfileCard } from '@/components/SaunaProfileCard'
 import { GlassCard } from '@/components/GlassCard'
 import { getSaunaProfileData, getAllRecordsRaw } from '@/lib/actions'
 import { adjustmentMessages } from '@/lib/sauna-base/scoreAdjustments'
+import { buildProfile } from '@/lib/sauna-base/profileRecommendations'
+import { TotonoiResultCard } from '@/components/sauna-base/totonoi/TotonoiResultCard'
 import type { SaunaProfile } from '@/types'
+import type { Heat, Water, Mind, Style } from '@/types/sauna-base'
 
 function tempToRadar(avgTemp: number | null): number {
   if (!avgTemp) return 3
@@ -63,9 +66,12 @@ export default async function ProfilePage() {
     freqToRadar(profile.visitFrequency),
   ]
 
-  const typeName = (saunaProfile as { type_name?: string | null } | null)?.type_name ?? null
-  const totonoiCode = (saunaProfile as { totonoi_code?: string | null } | null)?.totonoi_code ?? null
-  const adjustmentMsg = typeName ? adjustmentMessages[typeName] ?? null : null
+  const rawCode = (saunaProfile as { totonoi_code?: string | null } | null)?.totonoi_code ?? null
+  const totonoiProfile = rawCode && rawCode.length === 4 ? (() => {
+    const [h, w, m, s] = rawCode.split('')
+    try { return buildProfile(h as Heat, w as Water, m as Mind, s as Style) } catch { return null }
+  })() : null
+  const adjustmentMsg = totonoiProfile ? adjustmentMessages[totonoiProfile.typeName] ?? null : null
 
   return (
     <div className="p-4 lg:p-6 max-w-lg">
@@ -75,25 +81,11 @@ export default async function ProfilePage() {
       </div>
 
       {/* TOTONOI CODE カード */}
-      {totonoiCode && typeName ? (
-        <div
-          className="rounded-2xl p-4 mb-4"
-          style={{
-            background: 'rgba(165,214,58,0.07)',
-            border: '1px solid rgba(165,214,58,0.25)',
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <div>
-              <p className="text-[10px] text-[#a5d63a]/70 tracking-widest uppercase mb-0.5">TOTONOI CODE</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-[#a5d63a] tracking-wider">{totonoiCode}</span>
-                <span className="text-xs font-semibold text-white/60">{typeName}</span>
-              </div>
-            </div>
-          </div>
+      {totonoiProfile ? (
+        <div className="mb-4">
+          <TotonoiResultCard profile={totonoiProfile} variant="compact" />
           {adjustmentMsg && (
-            <p className="text-[10px] text-white/40 mt-2 leading-relaxed">{adjustmentMsg}</p>
+            <p className="text-[10px] text-white/40 mt-2 leading-relaxed px-1">{adjustmentMsg}</p>
           )}
         </div>
       ) : (

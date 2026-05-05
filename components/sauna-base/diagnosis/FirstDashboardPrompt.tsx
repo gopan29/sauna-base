@@ -1,21 +1,24 @@
 import Link from 'next/link'
 import type { TotonoiProfile } from '@/types/sauna-base'
-import { PenLine, Leaf } from 'lucide-react'
+import { PenLine } from 'lucide-react'
+import { TotonoiAnimalCard } from '@/components/sauna-base/totonoi/TotonoiAnimalCard'
 
 export function FirstDashboardPrompt({ profile }: { profile: TotonoiProfile }) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm text-center">
 
-        {/* アイコン */}
-        <div
-          className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-5"
-          style={{
-            background: 'linear-gradient(135deg, #a5d63a 0%, #4a7c20 100%)',
-            boxShadow: '0 0 40px rgba(165,214,58,0.35), 0 8px 32px rgba(0,0,0,0.4)',
-          }}
-        >
-          <Leaf className="w-10 h-10 text-white" />
+        {/* 動物キャラクター */}
+        <div className="flex justify-center mb-5">
+          <TotonoiAnimalCard
+            illustrationPath={profile.illustrationPath}
+            animalName={profile.animalName}
+            animalKey={profile.animalKey}
+            emoji={profile.emoji}
+            color={profile.color}
+            size="lg"
+            showName={false}
+          />
         </div>
 
         {/* メッセージ */}
