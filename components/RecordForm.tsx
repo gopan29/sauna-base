@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Star, Thermometer, Droplets, Check, MapPin, Plus, Wind, Home, Clock, X, Leaf } from 'lucide-react'
 import { GlassCard } from './GlassCard'
-import { calculateScore, getScoreRank } from '@/lib/score'
+import { calculateBaseScores, getScoreRank } from '@/lib/score'
+import { applyScoreAdjustment, adjustmentMessages } from '@/lib/sauna-base/scoreAdjustments'
 import { saveRecord, searchFacilities, addFacility } from '@/lib/actions'
 import { useAuth } from '@/contexts/AuthContext'
 import type { RestStyle, BodyCondition } from '@/types'
@@ -31,7 +32,7 @@ const conditionOptions: { value: BodyCondition; label: string }[] = [
   { value: 'sick',   label: '不調'     },
 ]
 
-export function RecordForm() {
+export function RecordForm({ typeName }: { typeName?: string | null }) {
   const { user } = useAuth()
   const [form, setForm] = useState({
     date: new Date().toISOString().slice(0, 10),
@@ -91,10 +92,13 @@ export function RecordForm() {
     setShowSuggestions(false)
   }
 
-  const score = calculateScore(
+  const baseScores = calculateBaseScores(
     form.sets, form.saunaTemp, form.waterTemp, form.restStyle, form.subjectiveRating
   )
+  const adjusted = applyScoreAdjustment(baseScores, typeName ?? null)
+  const score = adjusted.total
   const rank = getScoreRank(score)
+  const adjustmentMessage = typeName ? adjustmentMessages[typeName] ?? null : null
 
   if (!user) {
     return (
@@ -185,6 +189,9 @@ export function RecordForm() {
         <p className="text-xs text-white/50 mb-1">ととのいスコア（プレビュー）</p>
         <p className="text-5xl font-bold text-[#a5d63a]">{score}</p>
         <p className="text-sm text-[#7cb342] mt-1">{rank}</p>
+        {adjustmentMessage && (
+          <p className="text-[10px] text-white/35 mt-2 leading-relaxed">{adjustmentMessage}</p>
+        )}
       </GlassCard>
 
       {/* 基本情報 */}

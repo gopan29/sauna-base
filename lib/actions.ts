@@ -123,3 +123,33 @@ export async function getProfile() {
 
   return data
 }
+
+export async function saveProfileType(typeName: string, totonoiCode: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error } = await supabase
+    .from('sauna_profiles')
+    .upsert(
+      { user_id: user.id, type_name: typeName, totonoi_code: totonoiCode, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' }
+    )
+
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function getUserTypeName(): Promise<string | null> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data } = await supabase
+    .from('sauna_profiles')
+    .select('type_name')
+    .eq('user_id', user.id)
+    .single()
+
+  return (data as { type_name: string | null } | null)?.type_name ?? null
+}

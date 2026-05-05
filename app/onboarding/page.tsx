@@ -5,6 +5,7 @@ import type { DiagnosisStep, Scores, TotonoiProfile } from '@/types/sauna-base'
 import { questions } from '@/lib/sauna-base/diagnosisQuestions'
 import { initialScores, applyContribution, generateCode } from '@/lib/sauna-base/totonoiCode'
 import { buildProfile } from '@/lib/sauna-base/profileRecommendations'
+import { saveProfileType } from '@/lib/actions'
 import { DiagnosisStart } from '@/components/sauna-base/diagnosis/DiagnosisStart'
 import { DiagnosisQuestion } from '@/components/sauna-base/diagnosis/DiagnosisQuestion'
 import { DiagnosisLoading } from '@/components/sauna-base/diagnosis/DiagnosisLoading'
@@ -34,7 +35,10 @@ export default function OnboardingPage() {
     }
   }, [questionIndex, scores])
 
-  const handleLoadingDone = () => setStep('result')
+  const handleLoadingDone = () => {
+    if (profile) saveProfileType(profile.typeName, profile.code)
+    setStep('result')
+  }
   const handleResultContinue = () => setStep('profile')
   const handleProfileContinue = () => setStep('prompt')
 

@@ -132,6 +132,8 @@ export type Database = {
       sauna_profiles: {
         Row: {
           user_id: string
+          type_name: string | null
+          totonoi_code: string | null
           preferred_sauna_temp: string | null
           preferred_water_temp: string | null
           outdoor_preference: number
@@ -141,6 +143,8 @@ export type Database = {
         }
         Insert: {
           user_id: string
+          type_name?: string | null
+          totonoi_code?: string | null
           preferred_sauna_temp?: string | null
           preferred_water_temp?: string | null
           outdoor_preference?: number
@@ -149,6 +153,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          type_name?: string | null
+          totonoi_code?: string | null
           preferred_sauna_temp?: string | null
           preferred_water_temp?: string | null
           outdoor_preference?: number

@@ -1,4 +1,5 @@
 import type { SaunaRecord, ScoreRank, RestStyle } from '@/types'
+import type { BaseScores } from '@/lib/sauna-base/scoreAdjustments'
 
 function setsToScore(sets: number): number {
   if (sets >= 5) return 5
@@ -34,6 +35,22 @@ function restStyleToScore(style: RestStyle): number {
   return map[style]
 }
 
+export function calculateBaseScores(
+  sets: number,
+  saunaTemp: number,
+  waterTemp: number,
+  restStyle: RestStyle,
+  subjectiveRating: number
+): BaseScores {
+  return {
+    sets:       setsToScore(sets) * 2,
+    saunaTemp:  saunaTempToScore(saunaTemp) * 2,
+    waterTemp:  waterTempToScore(waterTemp) * 2,
+    rest:       restStyleToScore(restStyle) * 2,
+    subjective: Math.min(Math.max(subjectiveRating, 1), 5) * 2,
+  }
+}
+
 export function calculateScore(
   sets: number,
   saunaTemp: number,
@@ -41,12 +58,8 @@ export function calculateScore(
   restStyle: RestStyle,
   subjectiveRating: number
 ): number {
-  const s = setsToScore(sets)
-  const st = saunaTempToScore(saunaTemp)
-  const wt = waterTempToScore(waterTemp)
-  const rs = restStyleToScore(restStyle)
-  const sub = Math.min(Math.max(subjectiveRating, 1), 5)
-  return (s + st + wt + rs + sub) * 2
+  const b = calculateBaseScores(sets, saunaTemp, waterTemp, restStyle, subjectiveRating)
+  return b.sets + b.saunaTemp + b.waterTemp + b.rest + b.subjective
 }
 
 export function getScoreRank(score: number): ScoreRank {
