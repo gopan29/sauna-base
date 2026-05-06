@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase-server'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
 import type { Database } from '@/types/database'
 
@@ -78,7 +79,7 @@ export async function getMonthRecords(year: number, month: number) {
 
 export async function searchFacilities(query: string) {
   if (!query.trim()) return []
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase
     .from('sauna_facilities')
     .select('id, name, address, prefecture, city')
