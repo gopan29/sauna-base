@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Star, Thermometer, Droplets, Check, MapPin, Plus, Wind, Home, Clock, X, Leaf } from 'lucide-react'
+import { Star, Check, MapPin, Plus, Wind, Home, Clock, X, Leaf } from 'lucide-react'
 import { GlassCard } from './GlassCard'
 import { calculateBaseScores, getScoreRank } from '@/lib/score'
 import { applyScoreAdjustment, adjustmentMessages } from '@/lib/sauna-base/scoreAdjustments'
@@ -160,8 +160,8 @@ export function RecordForm({ typeName }: { typeName?: string | null }) {
       facility_name: form.facilityName,
       memo: form.memo || null,
       sets: form.sets,
-      sauna_temp: form.saunaTemp,
-      water_temp: form.waterTemp,
+      sauna_temp: Math.round(form.saunaTemp),
+      water_temp: Math.round(form.waterTemp),
       rest_style: form.restStyle,
       subjective_rating: form.subjectiveRating,
       body_condition: form.bodyCondition,
@@ -228,12 +228,12 @@ export function RecordForm({ typeName }: { typeName?: string | null }) {
 
           {/* サジェストドロップダウン */}
           {showSuggestions && (
-            <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden"
+            <div className="facility-suggest absolute z-50 w-full mt-1 rounded-xl overflow-hidden"
               style={{ background: 'rgba(10,20,8,0.96)', border: '1px solid rgba(124,179,66,0.25)', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
               {suggestions.map(f => (
                 <button key={f.id} type="button"
                   onMouseDown={() => selectFacility(f)}
-                  className="w-full flex items-start gap-2 px-3 py-2.5 text-left hover:bg-white/5 transition-colors">
+                  className="facility-suggest-item w-full flex items-start gap-2 px-3 py-2.5 text-left transition-colors">
                   <MapPin className="w-3.5 h-3.5 text-[#7cb342] shrink-0 mt-0.5" />
                   <div className="min-w-0">
                     <p className="text-sm text-white/85 font-medium truncate">{f.name}</p>
@@ -246,7 +246,7 @@ export function RecordForm({ typeName }: { typeName?: string | null }) {
               {/* DBにない場合は新規追加ボタン */}
               <button type="button"
                 onMouseDown={handleAddNewFacility}
-                className="w-full flex items-center gap-2 px-3 py-2.5 text-left border-t hover:bg-white/5 transition-colors"
+                className="facility-suggest-add w-full flex items-center gap-2 px-3 py-2.5 text-left border-t transition-colors"
                 style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
                 <Plus className="w-3.5 h-3.5 text-[#7cb342] shrink-0" />
                 <span className="text-sm text-[#7cb342]">「{form.facilityName}」を新しく追加</span>
@@ -285,44 +285,6 @@ export function RecordForm({ typeName }: { typeName?: string | null }) {
             </div>
             <button onClick={() => set('sets', Math.min(10, form.sets + 1))}
               className="w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-white glass">+</button>
-          </div>
-        </div>
-
-        {/* サウナ温度 */}
-        <div>
-          <div className="flex justify-between mb-1">
-            <label className="text-xs text-white/50 flex items-center gap-1">
-              <Thermometer className="w-3 h-3" /> サウナ温度
-            </label>
-            <span className="text-sm font-bold text-[#a5d63a]">{form.saunaTemp}℃</span>
-          </div>
-          <input type="range" min={60} max={120} step={1}
-            value={form.saunaTemp}
-            onChange={e => set('saunaTemp', Number(e.target.value))}
-            className="w-full"
-            style={{ accentColor: '#7cb342' }}
-          />
-          <div className="flex justify-between text-[10px] text-white/25 mt-0.5">
-            <span>60℃</span><span>110℃</span>
-          </div>
-        </div>
-
-        {/* 水風呂温度 */}
-        <div>
-          <div className="flex justify-between mb-1">
-            <label className="text-xs text-white/50 flex items-center gap-1">
-              <Droplets className="w-3 h-3" /> 水風呂温度
-            </label>
-            <span className="text-sm font-bold text-[#a5d63a]">{form.waterTemp}℃</span>
-          </div>
-          <input type="range" min={5} max={30} step={0.5}
-            value={form.waterTemp}
-            onChange={e => set('waterTemp', Number(e.target.value))}
-            className="w-full"
-            style={{ accentColor: '#7cb342' }}
-          />
-          <div className="flex justify-between text-[10px] text-white/25 mt-0.5">
-            <span>5℃</span><span>30℃</span>
           </div>
         </div>
 
