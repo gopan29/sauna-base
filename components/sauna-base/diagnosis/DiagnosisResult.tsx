@@ -1,5 +1,6 @@
 import type { TotonoiProfile } from '@/types/sauna-base'
 import { TotonoiResultCard } from '@/components/sauna-base/totonoi/TotonoiResultCard'
+import { ShareButtons } from '@/components/sauna-base/diagnosis/ShareButtons'
 
 export function DiagnosisResult({
   profile,
@@ -45,6 +46,9 @@ export function DiagnosisResult({
             ))}
           </div>
         </div>
+
+        {/* シェアボタン */}
+        <ShareButtons profile={profile} />
 
         {/* ボタン */}
         <button
