@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
 import type { Database } from '@/types/database'
 
-type SaunaRecordInsert = Database['public']['Tables']['sauna_records']['Insert']
+type SaunaRecordInsert = Database['sauna']['Tables']['sauna_records']['Insert']
 
 export async function getUserAndProfile() {
   const supabase = await createClient()

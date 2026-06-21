@@ -14,7 +14,7 @@ import { analyzeRecords } from '@/lib/ai-analysis'
 import type { SaunaRecord, SaunaProfile, CalendarDay } from '@/types'
 import type { Database } from '@/types/database'
 
-type DbRecord = Database['public']['Tables']['sauna_records']['Row']
+type DbRecord = Database['sauna']['Tables']['sauna_records']['Row']
 
 const DAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
